@@ -1,4 +1,4 @@
 
-public class Torre {
+public class Torre extends Peça {
 
 }

@@ -1,4 +1,4 @@
 
-public class Peça {
+public abstract class Peça {
 
 }

@@ -20,6 +20,15 @@ public class Tabuleiro {
 		
 		//Atualemente movimentos do cavalo e do rei
 		InicializarArrayListsDiversas ();
+		
+		/*Remover linhas a seguir:*/
+		peças.add(new Bispo (posições [4] [4], 2));
+		//posições[4][4].GetPeça().SetPino(new Pino (Direção.horizontal));
+		VerificarMovimentos (new Dimension (4,4));
+		
+		/*peças.add(new Torre (posições [5] [4], 2));
+
+		VerificarMovimentos (new Dimension (5,4));*/
 	}
 	
 	//Percorre a matriz tabuleiro criando 
@@ -58,8 +67,8 @@ public class Tabuleiro {
 		
 
 		peças.add(new Dama (posições [3] [0], 1));
-		peças.add(new Dama (posições [3] [7], 1));		
-		peças.add(new Rei (posições [4] [0], 2));
+		peças.add(new Dama (posições [3] [7], 2));		
+		peças.add(new Rei (posições [4] [0], 1));
 		peças.add(new Rei (posições [4] [7], 2));
 		
 	}
@@ -72,32 +81,190 @@ public class Tabuleiro {
 	public void VerificarMovimentos (Dimension dimension) {
 		//Ocorre ao clicar na peça e demonstra os possíveis movimentos com a peça
 		Peça peça = GetPosiçãoPorDimensão(dimension).GetPeça();
-		Class classe = peça.getClass();
+		Class classe;
+		try {
+			classe = peça.getClass();
+		} catch (Exception e) {
+			System.err.println("Nenhuma peça no quadrado selecionado");
+			return;
+		}
+		System.out.println(classe + " " + dimension.width + " " + dimension.height);
 		
 		if (classe == Peão.class) {
 			VerificarMovimentosDePeão (dimension, peça);
 			
-		} else if (classe == Torre.class) {
-			VerificarMovimentosLineares (dimension, peça);
-			
 		} else if (classe == Cavalo.class) {
 			VerificarMovimentosDeCavalo (dimension, peça);
 			
-		} else if (classe == Bispo.class) {
-			VerificarMovimentosDiagonais (dimension, peça);
-			
-		} else if (classe == Dama.class) {
-			VerificarMovimentosLineares (dimension, peça);
-			VerificarMovimentosDiagonais (dimension, peça);
-			
-		} else {
+		} else if (classe == Rei.class) {
 			VerificarMovimentosDeRei (dimension, peça);
+		} else {
+			ArrayList <Direção> direções = new ArrayList <Direção> ();
+			if (classe == Dama.class) {
+				direções.add(Direção.horizontal);
+				direções.add(Direção.vertical);
+				direções.add(Direção.diagonalDireito);
+				direções.add(Direção.diagonalEsquerdo);
+			} else if (classe == Torre.class) {
+				direções.add(Direção.horizontal);
+				direções.add(Direção.vertical);
+			} else if (classe == Bispo.class) {
+				direções.add(Direção.diagonalDireito);
+				direções.add(Direção.diagonalEsquerdo);
+			}
+			VerificarMovimentosLineares (direções, dimension, peça);
 		}
 	}
 	
-	private void VerificarMovimentosLineares (Dimension dimension, Peça peça) {
+	private void VerificarMovimentosLineares (ArrayList <Direção> direções, Dimension dimension, Peça peça) {
 		
+		Pino pino = peça.GetPino();
+		if (pino != null) {
+			Direção direçãoPino = pino.GetDireção();
+			if (!direções.contains(direçãoPino)) {
+				return;
+			}
+			direções.clear();
+			direções.add(direçãoPino);
+		}
+		int jogador = peça.GetJogador();
+		int x = 0, y = 0;
+		for (int n = 0; n < direções.size(); n ++) {
+			
+			switch (direções.get(n)) {
+			case diagonalDireito:
+				x = 1;
+				y = 1;
+				break;
+			case diagonalEsquerdo:
+				x = 1;
+				y = -1;
+				break;
+			case horizontal:
+				x = 1;
+				y = 0;
+				break;
+			case vertical:
+				x = 0;
+				y = 1;
+				break;
+			}
+			
+			for (int i = 0; i < 2; i ++) {
+				
+				ArrayList <Dimension> dimensions = new ArrayList <Dimension> ();
+				Dimension d = (Dimension) dimension.clone();
+				
+				while (d.width > 0 && d.width < 7 && d.height > 0 && d.height < 7) {
+					d.width += x;
+					d.height += y;
+					dimensions.add((Dimension)d.clone());
+				}
+				
+				boolean caminhoObstruído = false;
+				for (int j = 0; j < dimensions.size() && !caminhoObstruído; j ++) {
+					d = dimensions.get(j);
+					try {
+						if (GetPosiçãoPorDimensão(d).GetPeça().GetJogador() != jogador) {
+							Hightlight (d);
+						}
+						caminhoObstruído = true;
+					}
+					catch (Exception e) {
+						Hightlight (d);
+					}
+				}
+				x = -x;
+				y = -y;
+				System.out.println();
+			}
+		}
 	}
+	
+	
+	private void VerificarMovimentosLineares (Dimension dimension, Peça peça) {
+		int jogador = peça.GetJogador ();
+		Pino pino = peça.GetPino();
+		
+		VerificarMovimentosVerticais (dimension, peça, jogador, pino);
+		VerificarMovimentosHorizontais (dimension, peça, jogador, pino);
+	}
+	
+	private void VerificarMovimentosVerticais (Dimension dimension, Peça peça, int jogador, Pino pino) {
+		if (pino != null && pino.GetDireção () != Direção.vertical) {
+			return;
+		}
+
+		ArrayList <Dimension> dimensions [] = new ArrayList [2];
+		dimensions [0] = new ArrayList <Dimension> ();
+		dimensions [1] = new ArrayList <Dimension> ();
+		
+		Dimension d = (Dimension) dimension.clone();
+		
+		while (d.height < 7) {
+			d.height++;
+			dimensions[0].add((Dimension)d.clone());
+		}
+		d = (Dimension) dimension.clone();
+		while (d.height > 0) {
+			d.height--;
+			dimensions[1].add((Dimension)d.clone());
+		}
+		
+		for (int i = 0; i < 2; i ++) {
+			boolean caminhoObstruído = false;
+			for (int j = 0; j < dimensions[i].size() && !caminhoObstruído; j ++) {
+				d = dimensions[i].get(j);
+				try {
+					if (GetPosiçãoPorDimensão(d).GetPeça().GetJogador() != jogador) {
+						Hightlight (d);
+					}
+					caminhoObstruído = true;
+				}
+				catch (Exception e) {
+					Hightlight (d);
+				}
+			}
+		}
+	}
+	
+	private void VerificarMovimentosHorizontais (Dimension dimension, Peça peça, int jogador, Pino pino) {
+		if (pino != null && pino.GetDireção () != Direção.horizontal) {
+			return;
+		}
+
+		ArrayList <Dimension> dimensions [] = new ArrayList [2];
+		dimensions [0] = new ArrayList <Dimension> ();
+		dimensions [1] = new ArrayList <Dimension> ();
+		
+		Dimension d = (Dimension) dimension.clone();
+		
+		while (d.width < 7) {
+			d.width++;
+			dimensions[0].add((Dimension)d.clone());
+		}
+		d = (Dimension) dimension.clone();
+		while (d.width > 0) {
+			d.width--;
+			dimensions[1].add((Dimension)d.clone());
+		}
+		
+		for (int i = 0; i < 2; i ++) {
+			boolean caminhoObstruído = false;
+			for (int j = 0; j < dimensions[i].size() && !caminhoObstruído; j ++) {
+				d = dimensions[i].get(j);
+				try {
+					if (GetPosiçãoPorDimensão(d).GetPeça().GetJogador() != jogador) {
+						Hightlight (d);
+					}
+					caminhoObstruído = true;
+				}
+				catch (Exception e) {
+					Hightlight (d);
+				}
+			}
+		}
+	}	
 
 	private void VerificarMovimentosDiagonais (Dimension dimension, Peça peça) {
 	
@@ -116,9 +283,23 @@ public class Tabuleiro {
 					Hightlight (d);
 				}
 			}
-			finally {
+			catch (Exception e) {
+				Hightlight (d);
 			}
 		}
+	}
+	
+	private ArrayList <Dimension> GetMovimentosParaRei (Dimension dimension) {
+		ArrayList <Dimension> dimensions = new ArrayList <Dimension> ();
+		Dimension d;
+		for (int i = 0; i < 8; i ++) {
+			dimensions.add(new Dimension (dimension.width + movimentosRei.get(i).width, dimension.height + movimentosRei.get(i).height));
+			d = dimensions.get(dimensions.size() - 1);
+			if (d.height < 0 || d.width < 0 || d.height > 7 || d.width > 7) {
+				dimensions.remove(dimensions.size() - 1);
+			}
+		}
+		return dimensions;
 	}
 	
 	private void VerificarMovimentosDeCavalo (Dimension dimension, Peça peça) {
@@ -138,9 +319,23 @@ public class Tabuleiro {
 					Hightlight (d);
 				}
 			}
-			finally {
+			catch (Exception e) {
+				Hightlight (d);
 			}
 		}
+	}
+	
+	private ArrayList <Dimension> GetMovimentosParaCavalo (Dimension dimension) {
+		ArrayList <Dimension> dimensions = new ArrayList <Dimension> ();
+		Dimension d;
+		for (int i = 0; i < 8; i ++) {
+			dimensions.add(new Dimension (dimension.width + movimentosCavalo.get(i).width, dimension.height + movimentosCavalo.get(i).height));
+			d = dimensions.get(dimensions.size() - 1);
+			if (d.height < 0 || d.width < 0 || d.height > 7 || d.width > 7) {
+				dimensions.remove(dimensions.size() - 1);
+			}
+		}
+		return dimensions;
 	}
 	
 	private void VerificarMovimentosDePeão (Dimension dimension, Peça peça) {
@@ -148,7 +343,11 @@ public class Tabuleiro {
 	}
 	
 	private void Hightlight (Dimension dimension) {
-		//Troca a cor dos quadrados os quais a peça pode se mover para
+		System.out.print(dimension.width + "," + dimension.height + "  ");
+	}
+	
+	private void RemoveHightlights () {
+		//Remove o highlight dos quadrados que estiverem com hightlight
 	}
 	
 	private void InicializarArrayListsDiversas () {
@@ -171,29 +370,19 @@ public class Tabuleiro {
 		movimentosRei.add(new Dimension (-1,1));
 	}
 	
-	private ArrayList <Dimension> GetMovimentosParaCavalo (Dimension dimension) {
-		ArrayList <Dimension> dimensions = new ArrayList <Dimension> ();
-		Dimension d;
-		for (int i = 0; i < 8; i ++) {
-			dimensions.add(new Dimension (dimension.width + movimentosCavalo.get(i).width, dimension.height + movimentosCavalo.get(i).height));
-			d = dimensions.get(dimensions.size() - 1);
-			if (d.height < 0 || d.width < 0 || d.height > 7 || d.width > 7) {
-				dimensions.remove(dimensions.size() - 1);
+	/*Remover os métodos a seguir:*/
+	
+	public void MostrarTabuleiro () {
+		for (int i = 0; i < posições.length; i++) {
+			for (int j = 0; j < posições[1].length; j++) {
+				System.out.print(posições[j][i].GetPeça() + " ");
 			}
+			System.out.println();
 		}
-		return dimensions;
+		
 	}
 	
-	private ArrayList <Dimension> GetMovimentosParaRei (Dimension dimension) {
-		ArrayList <Dimension> dimensions = new ArrayList <Dimension> ();
-		Dimension d;
-		for (int i = 0; i < 8; i ++) {
-			dimensions.add(new Dimension (dimension.width + movimentosRei.get(i).width, dimension.height + movimentosRei.get(i).height));
-			d = dimensions.get(dimensions.size() - 1);
-			if (d.height < 0 || d.width < 0 || d.height > 7 || d.width > 7) {
-				dimensions.remove(dimensions.size() - 1);
-			}
-		}
-		return dimensions;
+	public static void main (String args []) {
+		Tabuleiro tabuleiro = new Tabuleiro ();
 	}
 }

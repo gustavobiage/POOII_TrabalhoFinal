@@ -24,4 +24,9 @@ public abstract class Peça {
 	public Pino GetPino () {
 		return pino;
 	}
+	
+	/*Remover métodos a seguir:*/
+	public void SetPino (Pino pino) {
+		this.pino = pino;
+	}
 }

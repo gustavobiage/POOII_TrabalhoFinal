@@ -22,9 +22,11 @@ public class Tabuleiro {
 		InicializarArrayListsDiversas ();
 		
 		/*Remover linhas a seguir:*/
-		peças.add(new Bispo (posições [4] [4], 2));
+		peças.add(new Peão (posições [0] [4], 2));
+		peças.add(new Peão (posições [3] [3], 1));
+		peças.add(new Peão (posições [5] [3], 1));
 		//posições[4][4].GetPeça().SetPino(new Pino (Direção.horizontal));
-		VerificarMovimentos (new Dimension (4,4));
+		VerificarMovimentos (new Dimension (0,4));
 		
 		/*peças.add(new Torre (posições [5] [4], 2));
 
@@ -250,7 +252,73 @@ public class Tabuleiro {
 	}
 	
 	private void VerificarMovimentosDePeão (Dimension dimension, Peça peça) {
+
+		int jogador = peça.GetJogador ();
 		
+		ArrayList <Direção> direções = new ArrayList <Direção> ();
+		direções.add(Direção.diagonalDireito);
+		direções.add(Direção.diagonalEsquerdo);
+		direções.add(Direção.vertical);
+		Pino pino = peça.GetPino();
+		if (pino != null) {
+			direções.clear();
+			direções.add(pino.GetDireção());
+		}
+		
+		ArrayList <Dimension> dimensions = new ArrayList <Dimension> ();
+		Dimension d;
+		int x = 1;
+		int y = 1;
+		if (jogador == 2) {
+			x = -1;
+			y = -1;
+		}		
+		if (direções.contains(Direção.vertical)) {
+			d = (Dimension) dimension.clone();
+			d.height += y;
+			
+			if (GetPosiçãoPorDimensão(d).GetPeça() == null) {
+				dimensions.add((Dimension) d.clone());
+				if (!peça.JáMoveu()) {
+					d.height += y;
+					if (GetPosiçãoPorDimensão(d).GetPeça() == null) {
+						dimensions.add((Dimension) d.clone());
+					}
+				}
+			}			
+		}
+		
+		if (direções.contains(Direção.diagonalDireito)) {
+			d = (Dimension) dimension.clone();
+			d.height += y;
+			d.width += x;
+			if (d.width >= 0 && d.width <= 7) {
+				try {
+					if (GetPosiçãoPorDimensão(d).GetPeça().GetJogador() != jogador) {
+						dimensions.add((Dimension) d.clone());
+					}
+				} catch (Exception e) {
+				}
+			}
+		}
+		
+		if (direções.contains(Direção.diagonalEsquerdo)) {
+			d = (Dimension) dimension.clone();
+			d.height += y;
+			d.width -= x;
+			if (d.width >= 0 && d.width <= 7) {
+				try {
+					if (GetPosiçãoPorDimensão(d).GetPeça().GetJogador() != jogador) {
+						dimensions.add((Dimension) d.clone());
+					}
+				} catch (Exception e) {
+				}
+			}
+		}
+		
+		for (int i = 0; i < dimensions.size(); i ++) {
+			Hightlight(dimensions.get(i));
+		}
 	}
 	
 	private void Hightlight (Dimension dimension) {

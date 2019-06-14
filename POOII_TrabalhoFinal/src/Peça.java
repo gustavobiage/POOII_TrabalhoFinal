@@ -6,6 +6,7 @@ public abstract class Peça {
 	//1 branco, 2 preto
 	private int jogador;
 	private Pino pino;
+	private boolean jáMoveu = false;
 	
 	public Peça (Posição posição, int jogador) {
 		this.posição = posição;
@@ -23,6 +24,10 @@ public abstract class Peça {
 	
 	public Pino GetPino () {
 		return pino;
+	}
+	
+	public boolean JáMoveu () {
+		return jáMoveu;
 	}
 	
 	/*Remover métodos a seguir:*/

@@ -1,9 +1,9 @@
 
-public class Rei extends Peça implements DetectorDeMovimento {
-	
+public class Peao extends Peça implements DetectorDeMovimento {
+
 	private boolean ativa = false;
 	
-	public Rei(Posição posição, int jogador) {
+	public Peao (Posição posição, int jogador) {
 		super(posição, jogador);
 	}
 
@@ -16,4 +16,5 @@ public class Rei extends Peça implements DetectorDeMovimento {
 	public boolean JaMoveu() {
 		return ativa;
 	}
+
 }

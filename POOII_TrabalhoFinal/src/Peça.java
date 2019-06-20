@@ -1,15 +1,14 @@
-    
-
 public abstract class Peça {
 	
 	//1 branco, 2 preto
 	private int jogador;
 	private Pino pino;
-	private boolean jáMoveu = false;
+	private Posição posição;
 	
 	public Peça (Posição posição, int jogador) {
 		this.jogador = jogador;
 		posição.AdicionarPeçaAPosição(this);
+		this.posição = posição;
 	}
 
 	public int GetJogador () {
@@ -20,8 +19,8 @@ public abstract class Peça {
 		return pino;
 	}
 	
-	public boolean JáMoveu () {
-		return jáMoveu;
+	public Posição GetPosição () {
+		return posição;
 	}
 	
 	/*Remover métodos a seguir:*/

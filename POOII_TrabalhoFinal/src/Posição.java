@@ -2,11 +2,11 @@ import java.awt.*;
 
 public class Posição {
 	
-	private Dimension posição;
+	private Dimension dimension;
 	private Peça peçaPresente;
 	
 	public Posição (int horizontal, int vertical) {
-		posição = new Dimension (horizontal,vertical);
+		dimension = new Dimension (horizontal,vertical);
 	}
 	
 	public void AdicionarPeçaAPosição (Peça peça) {
@@ -15,6 +15,10 @@ public class Posição {
 	
 	public Peça GetPeça () {
 		return peçaPresente;
+	}
+	
+	public Dimension GetDimension () {
+		return dimension;
 	}
 	
 }

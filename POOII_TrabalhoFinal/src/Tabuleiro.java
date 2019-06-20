@@ -27,9 +27,10 @@ public class Tabuleiro {
 		CriarPeças ();
 		
 		/*Remover linhas a seguir:*/
-		peças.add(new Dama(posicoes [4] [4], 2));
+		peças.add(new Rei (posicoes [4] [4], 2));
+		peças.add(new Torre (posicoes [1] [4], 2));
 		//posições[4][4].GetPeça().SetPino(new Pino (Direção.horizontal));
-		VerificarMovimentos (new Dimension (4,4));
+		//VerificarMovimentos (new Dimension (4,4));
 	}
 	
 	//Percorre a matriz tabuleiro criando 
@@ -45,8 +46,8 @@ public class Tabuleiro {
 	private void CriarPeças () {
 		
 		for (int i = 0; i < 8; i ++) {
-			peças.add(new Peão (posicoes [i] [1], 1));
-			peças.add(new Peão (posicoes [i] [6], 2));
+			peças.add(new Peao (posicoes [i] [1], 1));
+			peças.add(new Peao (posicoes [i] [6], 2));
 		}
 		
 		peças.add(new Torre (posicoes [0] [0], 1));
@@ -88,6 +89,16 @@ public class Tabuleiro {
 		}
 	}
 	
+	public ArrayList <Torre> GetTorres (int jogador) {
+		ArrayList <Torre> lista = new ArrayList <Torre> ();
+		for (Peça peça: peças) {
+			if (peça.getClass() == Torre.class && peça.GetJogador() == jogador) {
+				lista.add((Torre)peça);
+			}
+		}
+		return lista;
+	}
+	
 	public void Hightlight (Dimension dimension) {
 		System.out.print(dimension.width + "," + dimension.height + "  ");
 	}
@@ -109,6 +120,6 @@ public class Tabuleiro {
 	}
 	
 	public static void main (String args []) {
-		//Tabuleiro tabuleiro = new Tabuleiro ();
+		tabuleiro.GetInstance().VerificarMovimentos (new Dimension (4,4));
 	}
 }

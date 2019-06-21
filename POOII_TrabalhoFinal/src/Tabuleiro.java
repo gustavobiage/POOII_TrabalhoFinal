@@ -13,10 +13,11 @@ public class Tabuleiro {
 		tabuleiro = new Tabuleiro ();
 	}
 	
-	//Primeiro número largura do tabuleiro e segundo para a altura
+	//Primeiro número largura do tabuleiro e segundo altura
 	private Posição [][] posicoes = new Posição [8] [8];
-	
 	private ArrayList <Peça> peças = new ArrayList <Peça> ();
+	private int turno = 1;
+	private int jogadorAtual = 1;
 	
 	private Tabuleiro () {
 		
@@ -27,8 +28,9 @@ public class Tabuleiro {
 		CriarPeças ();
 		
 		/*Remover linhas a seguir:*/
-		peças.add(new Rei (posicoes [4] [4], 2));
-		peças.add(new Torre (posicoes [1] [4], 2));
+		peças.add(new Torre (posicoes [4] [4], 2));
+		peças.add(new Rei (posicoes [5] [5], 2));
+		peças.add(new Dama (posicoes [3] [3], 1));
 		//posições[4][4].GetPeça().SetPino(new Pino (Direção.horizontal));
 		//VerificarMovimentos (new Dimension (4,4));
 	}
@@ -71,7 +73,7 @@ public class Tabuleiro {
 		peças.add(new Dama (posicoes [3] [0], 1));
 		peças.add(new Dama (posicoes [3] [7], 2));		
 		peças.add(new Rei (posicoes [4] [0], 1));
-		peças.add(new Rei (posicoes [4] [7], 2));
+		//peças.add(new Rei (posicoes [4] [7], 2));
 		
 	}
 	
@@ -83,9 +85,25 @@ public class Tabuleiro {
 	public void VerificarMovimentos (Dimension posicaoInicial) {
 		//Ocorre ao clicar na peça e demonstra os possíveis movimentos com a peça
 		Peça peça = GetPosiçãoPorDimensão(posicaoInicial).GetPeça();
-		ArrayList <Dimension> dimensions = AdaptadorDeMovimento.GetInstance().AdaptarMovimentos(peça, posicaoInicial, posicoes);
+		ArrayList <Dimension> dimensions = AdaptadorDeMovimento.GetInstance().AdaptarMovimentos(peça, posicaoInicial);
 		for (Dimension d: dimensions) {
 			Hightlight (d);
+		}
+	}
+	
+	//Verifica se o jogador nao tera movimentos disponiveis resultando em um emapte:
+	public void VerificarEmpate () {
+		boolean empateNegado = false;
+		for (Peça peça : peças) {
+			if (peça.GetJogador() == jogadorAtual) {
+				if (AdaptadorDeMovimento.GetInstance().AdaptarMovimentos(peça, peça.GetPosição().GetDimension()).size() > 0) {
+					empateNegado = true;
+					break;
+				}
+			}
+		}
+		if (!empateNegado) {
+			Empatar ();
 		}
 	}
 	
@@ -99,8 +117,22 @@ public class Tabuleiro {
 		return lista;
 	}
 	
+	public Rei GetRei (int jogador) {
+		for (Peça peça: peças) {
+			if (peça.getClass() == Rei.class && peça.GetJogador() == jogador) {
+				return (Rei) peça;
+			}
+		}
+		System.err.println("Erro, rei nao encontrado.");
+		return null;
+	}
+	
 	public void Hightlight (Dimension dimension) {
 		System.out.print(dimension.width + "," + dimension.height + "  ");
+	}
+	
+	private void Empatar () {
+		//Termina o jogo com um emapte
 	}
 	
 	public void RemoveHightlights () {

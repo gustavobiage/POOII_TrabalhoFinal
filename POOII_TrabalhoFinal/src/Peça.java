@@ -19,12 +19,11 @@ public abstract class Peça {
 		return pino;
 	}
 	
-	public Posição GetPosição () {
-		return posição;
+	public void AddPino (Pino pino) {
+		this.pino = pino;
 	}
 	
-	/*Remover métodos a seguir:*/
-	public void SetPino (Pino pino) {
-		this.pino = pino;
+	public Posição GetPosição () {
+		return posição;
 	}
 }

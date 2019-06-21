@@ -20,7 +20,8 @@ public class AdaptadorDeMovimento {
 		return adaptadorDeMovimento;
 	}
 	
-	public ArrayList <Dimension> AdaptarMovimentos (Peça peça, Dimension dimension, Posição [][] posições) {
+	public ArrayList <Dimension> AdaptarMovimentos (Peça peça, Dimension dimension) {
+		
 		ArrayList <Dimension> dimensions = new ArrayList <Dimension> ();
 		Class classe;
 		try {
@@ -30,6 +31,8 @@ public class AdaptadorDeMovimento {
 			return dimensions;
 		}
 		System.out.println(classe + " " + dimension.width + " " + dimension.height);
+		
+		VerificarPino (peça, dimension);
 		
 		if (classe == Peao.class) {
 			dimensions = VerificarMovimentosDePeão (peça, dimension, dimensions);
@@ -65,7 +68,7 @@ public class AdaptadorDeMovimento {
 		if (pino != null) {
 			Direção direçãoPino = pino.GetDireção();
 			if (!direções.contains(direçãoPino)) {
-				return null;
+				return dimensions;
 			}
 			direções.clear();
 			direções.add(direçãoPino);
@@ -107,7 +110,6 @@ public class AdaptadorDeMovimento {
 				for (int j = 0; j < initialDimensions.size() && !caminhoObstruído; j ++) {
 					d = initialDimensions.get(j);
 					try {
-						System.out.println(Tabuleiro.GetInstance().GetPosiçãoPorDimensão(d).GetPeça().GetJogador());
 						if (Tabuleiro.GetInstance().GetPosiçãoPorDimensão(d).GetPeça().GetJogador() != jogador) {
 							dimensions.add (d);
 						}
@@ -179,10 +181,8 @@ public class AdaptadorDeMovimento {
 							}
 							d.width += x;
 						}
-						System.out.println("a");
 						//Checar por zonas de ameaça:
 						if (caminhoLivre) {
-							System.out.println("b");
 							d.width -= 2*x;
 							dimensions.add(d);
 						}
@@ -250,12 +250,7 @@ public class AdaptadorDeMovimento {
 			d = (Dimension) dimension.clone();
 			d.height += y;
 			
-			if (d.height > 7) {
-				System.out.println("a");
-			}
-			
-			Posição da = Tabuleiro.GetInstance().GetPosiçãoPorDimensão(d);
-			if (da.GetPeça() == null) {
+			if (Tabuleiro.GetInstance().GetPosiçãoPorDimensão(d).GetPeça() == null) {
 				initialDimensions.add((Dimension) d.clone());
 				DetectorDeMovimento dMovimento = (DetectorDeMovimento) peça;
 				if (!dMovimento.JaMoveu()) {
@@ -300,4 +295,76 @@ public class AdaptadorDeMovimento {
 		}
 		return dimensions;
 	}	
+	
+	private void VerificarPino (Peça peça, Dimension dimension) {
+		int jogador = peça.GetJogador();
+		Rei rei = Tabuleiro.GetInstance().GetRei(jogador);
+		Dimension reiDimension = rei.GetPosição().GetDimension();
+		int x = 0, y = 0;
+		Direção direção;
+		
+		if (reiDimension.height == dimension.height) {
+			direção = Direção.horizontal;
+			if (reiDimension.width > dimension.width) {
+				x = -1;
+			} else {
+				x = 1;
+			}
+		} else if (reiDimension.width == dimension.width){
+			direção = Direção.vertical;
+			if (reiDimension.height > dimension.height) {
+				y = -1;
+			} else {
+				y = 1;				
+			}
+		} else if (Math.abs(reiDimension.width - dimension.width) == Math.abs(reiDimension.height - dimension.height)) {
+			if (reiDimension.width > dimension.width) {
+				x = -1;
+			} else { 
+				x = 1;
+			} if (reiDimension.height > dimension.height) {
+				y = -1;
+			} else { 
+				y = 1;
+			}
+			if (x == 1 && y == 1 || x == -1 && y == -1) {
+				direção = Direção.diagonalDireito;
+			} else {
+				direção = Direção.diagonalEsquerdo;
+			}
+		} else {
+			return;
+		}
+		
+		Dimension d = (Dimension) dimension.clone();
+		d.width += x;
+		d.height += y;
+		Peça p;
+		
+		while (d.width >= 0 && d.width <= 7 && d.height >= 0 && d.height <= 7) {
+			System.out.println("Width " + d.width + ". Heigth: " + d.height);
+			p = Tabuleiro.GetInstance().GetPosiçãoPorDimensão(d).GetPeça();
+			
+			if (p != null) {
+
+				if (p.GetJogador() == jogador) {
+					return;
+				} else {
+					if (direção == Direção.vertical || direção == Direção.horizontal) {
+						if (p.getClass() == Torre.class || p.getClass() == Dama.class) {
+							peça.AddPino(new Pino (direção));
+						}
+					} else if (direção == Direção.diagonalDireito || direção == Direção.diagonalEsquerdo) {
+						if (p.getClass() == Bispo.class || p.getClass() == Dama.class) {
+							peça.AddPino(new Pino (direção));
+						}
+					}
+					return;
+				}
+			}
+			
+			d.width += x;
+			d.height += y;
+		}
+	}
 }

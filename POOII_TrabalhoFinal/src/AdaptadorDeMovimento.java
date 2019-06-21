@@ -20,28 +20,29 @@ public class AdaptadorDeMovimento {
 		return adaptadorDeMovimento;
 	}
 	
-	public ArrayList <Dimension> AdaptarMovimentos (Peça peça, Dimension dimension) {
+	public ArrayList <Dimension> AdaptarMovimentos (Peca peca, Dimension dimension) {
 		
 		ArrayList <Dimension> dimensions = new ArrayList <Dimension> ();
 		Class classe;
 		try {
-			classe = peça.getClass();
+			classe = peca.getClass();
 		} catch (Exception e) {
 			System.err.println("Nenhuma peça no quadrado selecionado");
 			return dimensions;
 		}
 		System.out.println(classe + " " + dimension.width + " " + dimension.height);
 		
-		VerificarPino (peça, dimension);
+		peca.RemoverPino ();
+		VerificarPino (peca, dimension);
 		
 		if (classe == Peao.class) {
-			dimensions = VerificarMovimentosDePeão (peça, dimension, dimensions);
+			dimensions = VerificarMovimentosDePeão (peca, dimension, dimensions);
 			
 		} else if (classe == Cavalo.class) {
-			dimensions = VerificarMovimentosDeCavalo (peça, dimension, dimensions);
+			dimensions = VerificarMovimentosDeCavalo (peca, dimension, dimensions);
 			
 		} else if (classe == Rei.class) {
-			dimensions = VerificarMovimentosDeRei (peça, dimension, dimensions);
+			dimensions = VerificarMovimentosDeRei (peca, dimension, dimensions);
 		} else {
 			ArrayList <Direção> direcoes = new ArrayList <Direção> ();
 			if (classe == Dama.class) {
@@ -56,15 +57,15 @@ public class AdaptadorDeMovimento {
 				direcoes.add(Direção.diagonalDireito);
 				direcoes.add(Direção.diagonalEsquerdo);
 			}
-			dimensions = VerificarMovimentosLineares (peça, dimension, dimensions, direcoes);
+			dimensions = VerificarMovimentosLineares (peca, dimension, dimensions, direcoes);
 		}
 		return dimensions;
 	}
 	
-	private ArrayList <Dimension> VerificarMovimentosLineares (Peça peça, Dimension dimension, ArrayList <Dimension> dimensions, 
+	private ArrayList <Dimension> VerificarMovimentosLineares (Peca peca, Dimension dimension, ArrayList <Dimension> dimensions, 
 			ArrayList <Direção> direções) {
 		
-		Pino pino = peça.GetPino();
+		Pino pino = peca.GetPino();
 		if (pino != null) {
 			Direção direçãoPino = pino.GetDireção();
 			if (!direções.contains(direçãoPino)) {
@@ -73,7 +74,7 @@ public class AdaptadorDeMovimento {
 			direções.clear();
 			direções.add(direçãoPino);
 		}
-		int jogador = peça.GetJogador();
+		int jogador = peca.GetJogador();
 		int x = 0, y = 0;
 		for (int n = 0; n < direções.size(); n ++) {
 			
@@ -110,7 +111,7 @@ public class AdaptadorDeMovimento {
 				for (int j = 0; j < initialDimensions.size() && !caminhoObstruído; j ++) {
 					d = initialDimensions.get(j);
 					try {
-						if (Tabuleiro.GetInstance().GetPosiçãoPorDimensão(d).GetPeça().GetJogador() != jogador) {
+						if (Tabuleiro.GetInstance().GetPosicaoPorDimension(d).GetPeca().GetJogador() != jogador) {
 							dimensions.add (d);
 						}
 						caminhoObstruído = true;
@@ -126,7 +127,7 @@ public class AdaptadorDeMovimento {
 		return dimensions;
 	}
 
-	private ArrayList <Dimension> VerificarMovimentosDeRei (Peça peça, Dimension dimension, ArrayList <Dimension> dimensions) {
+	private ArrayList <Dimension> VerificarMovimentosDeRei (Peca peca, Dimension dimension, ArrayList <Dimension> dimensions) {
 				
 		ArrayList <Dimension> initialDimensions = new ArrayList <Dimension> ();
 		Dimension d = new Dimension ();
@@ -137,12 +138,12 @@ public class AdaptadorDeMovimento {
 			}
 		}
 		
-		int jogador = peça.GetJogador ();
+		int jogador = peca.GetJogador ();
 		
 		for (int i = 0; i < initialDimensions.size(); i ++) {
 			d = initialDimensions.get(i);
 			try {
-				if (Tabuleiro.GetInstance().GetPosiçãoPorDimensão(d).GetPeça().GetJogador() != jogador) {
+				if (Tabuleiro.GetInstance().GetPosicaoPorDimension(d).GetPeca().GetJogador() != jogador) {
 					dimensions.add(d);
 				}
 			}
@@ -152,7 +153,7 @@ public class AdaptadorDeMovimento {
 		}
 		
 		//Roque:
-		DetectorDeMovimento dMovimento = (DetectorDeMovimento) peça;
+		DetectorDeMovimento dMovimento = (DetectorDeMovimento) peca;
 		if (!dMovimento.JaMoveu()) {
 			ArrayList <Torre> torres = new ArrayList <Torre> ();
 			torres = Tabuleiro.GetInstance().GetTorres(jogador);
@@ -162,7 +163,7 @@ public class AdaptadorDeMovimento {
 			for (Torre torre : torres) {
 				if (!torre.JaMoveu()) {
 					
-					Dimension torreDimension = torre.GetPosição().GetDimension();
+					Dimension torreDimension = torre.GetPosicao().GetDimension();
 					x = 0;
 					
 					if (torreDimension.height == dimension.height) {
@@ -176,7 +177,7 @@ public class AdaptadorDeMovimento {
 						d.width += x;
 						caminhoLivre = true;
 						while (!d.equals(dimension) && caminhoLivre) {
-							if (Tabuleiro.GetInstance().GetPosiçãoPorDimensão(d).GetPeça() != null) {
+							if (Tabuleiro.GetInstance().GetPosicaoPorDimension(d).GetPeca() != null) {
 								caminhoLivre = false;
 							}
 							d.width += x;
@@ -194,26 +195,19 @@ public class AdaptadorDeMovimento {
 		return dimensions;
 	}
 	
-	private ArrayList <Dimension> VerificarMovimentosDeCavalo (Peça peça, Dimension dimension, ArrayList <Dimension> dimensions) {
-		if (peça.GetPino () != null) {
+	private ArrayList <Dimension> VerificarMovimentosDeCavalo (Peca peca, Dimension dimension, ArrayList <Dimension> dimensions) {
+		if (peca.GetPino () != null) {
 			return dimensions;
 		}
 		
-		ArrayList <Dimension> initialDimensions = new ArrayList <Dimension> ();
-		Dimension d;
-		for (int i = 0; i < 8; i ++) {
-			d = new Dimension (dimension.width + movimentosCavalo[i].width, dimension.height + movimentosCavalo[i].height);
-			if (d.height >= 0 && d.width >= 0 && d.height <= 7 && d.width <= 7) {
-				initialDimensions.add(d);
-			}
-		}
-		
-		int jogador = peça.GetJogador ();
+		ArrayList <Dimension> initialDimensions = GetMovimentosDeCavalo (dimension, dimensions);
+		Dimension d;		
+		int jogador = peca.GetJogador ();
 		
 		for (int i = 0; i < initialDimensions.size(); i ++) {
 			d = initialDimensions.get(i);
 			try {
-				if (Tabuleiro.GetInstance().GetPosiçãoPorDimensão(d).GetPeça().GetJogador() != jogador) {
+				if (Tabuleiro.GetInstance().GetPosicaoPorDimension(d).GetPeca().GetJogador() != jogador) {
 					dimensions.add(d);
 				}
 			}
@@ -224,15 +218,27 @@ public class AdaptadorDeMovimento {
 		return dimensions;
 	}
 	
-	private ArrayList <Dimension> VerificarMovimentosDePeão (Peça peça, Dimension dimension, ArrayList <Dimension> dimensions) {
+	private ArrayList <Dimension> GetMovimentosDeCavalo (Dimension dimension, ArrayList <Dimension> dimensions) {
+		ArrayList <Dimension> initialDimensions = new ArrayList <Dimension> ();
+		Dimension d;
+		for (int i = 0; i < 8; i ++) {
+			d = new Dimension (dimension.width + movimentosCavalo[i].width, dimension.height + movimentosCavalo[i].height);
+			if (d.height >= 0 && d.width >= 0 && d.height <= 7 && d.width <= 7) {
+				initialDimensions.add(d);
+			}
+		}
+		return initialDimensions;
+	}
+	
+	private ArrayList <Dimension> VerificarMovimentosDePeão (Peca peca, Dimension dimension, ArrayList <Dimension> dimensions) {
 
-		int jogador = peça.GetJogador ();
+		int jogador = peca.GetJogador ();
 		
 		ArrayList <Direção> direcoes = new ArrayList <Direção> ();
 		direcoes.add(Direção.diagonalDireito);
 		direcoes.add(Direção.diagonalEsquerdo);
 		direcoes.add(Direção.vertical);
-		Pino pino = peça.GetPino();
+		Pino pino = peca.GetPino();
 		if (pino != null) {
 			direcoes.clear();
 			direcoes.add(pino.GetDireção());
@@ -250,12 +256,12 @@ public class AdaptadorDeMovimento {
 			d = (Dimension) dimension.clone();
 			d.height += y;
 			
-			if (Tabuleiro.GetInstance().GetPosiçãoPorDimensão(d).GetPeça() == null) {
+			if (Tabuleiro.GetInstance().GetPosicaoPorDimension(d).GetPeca() == null) {
 				initialDimensions.add((Dimension) d.clone());
-				DetectorDeMovimento dMovimento = (DetectorDeMovimento) peça;
+				DetectorDeMovimento dMovimento = (DetectorDeMovimento) peca;
 				if (!dMovimento.JaMoveu()) {
 					d.height += y;
-					if (Tabuleiro.GetInstance().GetPosiçãoPorDimensão(d).GetPeça() == null) {
+					if (Tabuleiro.GetInstance().GetPosicaoPorDimension(d).GetPeca() == null) {
 						initialDimensions.add((Dimension) d.clone());
 					}
 				}
@@ -268,7 +274,7 @@ public class AdaptadorDeMovimento {
 			d.width += x;
 			if (d.width >= 0 && d.width <= 7) {
 				try {
-					if (Tabuleiro.GetInstance().GetPosiçãoPorDimensão(d).GetPeça().GetJogador() != jogador) {
+					if (Tabuleiro.GetInstance().GetPosicaoPorDimension(d).GetPeca().GetJogador() != jogador) {
 						initialDimensions.add((Dimension) d.clone());
 					}
 				} catch (Exception e) {
@@ -282,7 +288,7 @@ public class AdaptadorDeMovimento {
 			d.width -= x;
 			if (d.width >= 0 && d.width <= 7) {
 				try {
-					if (Tabuleiro.GetInstance().GetPosiçãoPorDimensão(d).GetPeça().GetJogador() != jogador) {
+					if (Tabuleiro.GetInstance().GetPosicaoPorDimension(d).GetPeca().GetJogador() != jogador) {
 						initialDimensions.add((Dimension) d.clone());
 					}
 				} catch (Exception e) {
@@ -296,10 +302,10 @@ public class AdaptadorDeMovimento {
 		return dimensions;
 	}	
 	
-	private void VerificarPino (Peça peça, Dimension dimension) {
-		int jogador = peça.GetJogador();
+	private void VerificarPino (Peca peca, Dimension dimension) {
+		int jogador = peca.GetJogador();
 		Rei rei = Tabuleiro.GetInstance().GetRei(jogador);
-		Dimension reiDimension = rei.GetPosição().GetDimension();
+		Dimension reiDimension = rei.GetPosicao().GetDimension();
 		int x = 0, y = 0;
 		Direção direção;
 		
@@ -339,11 +345,11 @@ public class AdaptadorDeMovimento {
 		Dimension d = (Dimension) dimension.clone();
 		d.width += x;
 		d.height += y;
-		Peça p;
+		Peca p;
 		
 		while (d.width >= 0 && d.width <= 7 && d.height >= 0 && d.height <= 7) {
 			System.out.println("Width " + d.width + ". Heigth: " + d.height);
-			p = Tabuleiro.GetInstance().GetPosiçãoPorDimensão(d).GetPeça();
+			p = Tabuleiro.GetInstance().GetPosicaoPorDimension(d).GetPeca();
 			
 			if (p != null) {
 
@@ -352,11 +358,11 @@ public class AdaptadorDeMovimento {
 				} else {
 					if (direção == Direção.vertical || direção == Direção.horizontal) {
 						if (p.getClass() == Torre.class || p.getClass() == Dama.class) {
-							peça.AddPino(new Pino (direção));
+							peca.AddPino(new Pino (direção));
 						}
 					} else if (direção == Direção.diagonalDireito || direção == Direção.diagonalEsquerdo) {
 						if (p.getClass() == Bispo.class || p.getClass() == Dama.class) {
-							peça.AddPino(new Pino (direção));
+							peca.AddPino(new Pino (direção));
 						}
 					}
 					return;
@@ -367,4 +373,103 @@ public class AdaptadorDeMovimento {
 			d.height += y;
 		}
 	}
+	
+	public Peca VerificarAmeaca (Dimension dimension, int jogador) {
+		
+		Peca p;
+		Dimension d;		
+
+		//Checando por peoes:
+		int y = 1;
+		if (jogador == 2) {
+			y = -1;
+		}
+		d = (Dimension) dimension.clone();
+		d.height += y;
+		if (d.getHeight() >= 0 && d.getHeight() <= 7) {
+			d.width += 1;
+			if (d.width <= 7) {
+				p  = Tabuleiro.GetInstance().GetPosicaoPorDimension(d).GetPeca();
+				if (p != null) {
+					if (p.getClass() == Peao.class && p.GetJogador() != jogador) {
+						return p;
+					}
+				}
+			}
+			d.width -= 2;
+			if (d.width >= 0) {
+				p  = Tabuleiro.GetInstance().GetPosicaoPorDimension(d).GetPeca();
+				if (p != null) {
+					if (p.getClass() == Peao.class && p.GetJogador() != jogador) {
+						return p;
+					}
+				}
+			}
+		}
+		
+		//Checando por cavalos:
+		ArrayList <Dimension> dimensions = new ArrayList <Dimension> ();
+		dimensions = GetMovimentosDeCavalo (dimension, dimensions);
+		for (Dimension d1: dimensions) {
+			p  = Tabuleiro.GetInstance().GetPosicaoPorDimension(d1).GetPeca();
+			if (p != null) {
+				if (p.getClass() == Cavalo.class && p.GetJogador() != jogador) {
+					return p;
+				}
+			}
+		}
+		
+		//Checando para movimentos lineares:
+		int x = 0;
+		for (int i = 0; i < 4; i ++) {
+			switch (i) {
+			case 0:
+				x = 1;
+				y = 1;
+				break;
+			case 1:
+				x = 1;
+				y = -1;
+				break;
+			case 2:
+				x = 1;
+				y = 0;
+				break;
+			case 3:
+				x = 0;
+				y = 1;
+				break;
+			}
+			
+			for (int j = 0; j < 2; j ++) {
+				ArrayList <Dimension> initialDimensions = new ArrayList <Dimension> ();
+				d = (Dimension) dimension.clone();
+				
+				while (d.width > 0 && d.width < 7 && d.height > 0 && d.height < 7) {
+					d.width += x;
+					d.height += y;
+					initialDimensions.add((Dimension)d.clone());
+				}
+				
+				boolean caminhoObstruído = false;
+				for (int k = 0; k < initialDimensions.size() && !caminhoObstruído; k ++) {
+					d = initialDimensions.get(k);					
+					p  = Tabuleiro.GetInstance().GetPosicaoPorDimension(d).GetPeca();
+					try {
+						if (p.GetJogador() != jogador && (p.getClass() == Dama.class || (p.getClass() == Bispo.class && (i == 0 || i == 1))
+								|| p.getClass() == Torre.class && (i == 2 || i == 3))) {
+							return p;
+						}
+						caminhoObstruído = true;
+					}
+					catch (Exception e) {
+					}
+				}
+				x = -x;
+				y = -y;
+			}
+		}
+		return null;
+	}
+	
 }

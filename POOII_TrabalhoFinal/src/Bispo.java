@@ -1,8 +1,8 @@
 
-public class Bispo extends Peça {
+public class Bispo extends Peca {
 
-	public Bispo(Posição posição, int jogador) {
-		super(posição, jogador);
+	public Bispo(Posicao posicao, int jogador) {
+		super(posicao, jogador);
 	}
 
 }

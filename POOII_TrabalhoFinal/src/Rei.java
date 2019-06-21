@@ -1,10 +1,10 @@
 
-public class Rei extends Peça implements DetectorDeMovimento {
+public class Rei extends Peca implements DetectorDeMovimento {
 	
 	private boolean ativa = false;
 	
-	public Rei(Posição posição, int jogador) {
-		super(posição, jogador);
+	public Rei(Posicao posicao, int jogador) {
+		super(posicao, jogador);
 	}
 
 	@Override

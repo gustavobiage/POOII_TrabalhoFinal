@@ -1,19 +1,4 @@
 
-public class Rei extends Peca implements DetectorDeMovimento {
-	
-	private boolean ativa = false;
-	
-	public Rei(Posicao posicao, int jogador) {
-		super(posicao, jogador);
-	}
+public class Rei extends Peça {
 
-	@Override
-	public void TornarAtiva() {
-		ativa = true;
-	}
-
-	@Override
-	public boolean JaMoveu() {
-		return ativa;
-	}
 }

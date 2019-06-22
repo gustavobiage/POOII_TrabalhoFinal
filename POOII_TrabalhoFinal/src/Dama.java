@@ -1,8 +1,4 @@
 
-public class Dama extends Peca {
-
-	public Dama(Posicao posicao, int jogador) {
-		super(posicao, jogador);
-	}
+public class Dama extends Peça {
 
 }

@@ -27,7 +27,7 @@ public class AdaptadorDeMovimento {
 		try {
 			classe = peca.getClass();
 		} catch (Exception e) {
-			System.err.println("Nenhuma peça no quadrado selecionado");
+			System.err.println("Nenhuma peï¿½a no quadrado selecionado");
 			return dimensions;
 		}
 		System.out.println(classe + " " + dimension.width + " " + dimension.height);
@@ -36,7 +36,7 @@ public class AdaptadorDeMovimento {
 		VerificarPino (peca, dimension);
 		
 		if (classe == Peao.class) {
-			dimensions = VerificarMovimentosDePeão (peca, dimension, dimensions);
+			dimensions = VerificarMovimentosDePeao (peca, dimension, dimensions);
 			
 		} else if (classe == Cavalo.class) {
 			dimensions = VerificarMovimentosDeCavalo (peca, dimension, dimensions);
@@ -44,18 +44,18 @@ public class AdaptadorDeMovimento {
 		} else if (classe == Rei.class) {
 			dimensions = VerificarMovimentosDeRei (peca, dimension, dimensions);
 		} else {
-			ArrayList <Direção> direcoes = new ArrayList <Direção> ();
+			ArrayList <Direcao> direcoes = new ArrayList <Direcao> ();
 			if (classe == Dama.class) {
-				direcoes.add(Direção.horizontal);
-				direcoes.add(Direção.vertical);
-				direcoes.add(Direção.diagonalDireito);
-				direcoes.add(Direção.diagonalEsquerdo);
+				direcoes.add(Direcao.horizontal);
+				direcoes.add(Direcao.vertical);
+				direcoes.add(Direcao.diagonalDireito);
+				direcoes.add(Direcao.diagonalEsquerdo);
 			} else if (classe == Torre.class) {
-				direcoes.add(Direção.horizontal);
-				direcoes.add(Direção.vertical);
+				 direcoes.add(Direcao.horizontal);
+				direcoes.add(Direcao.vertical);
 			} else if (classe == Bispo.class) {
-				direcoes.add(Direção.diagonalDireito);
-				direcoes.add(Direção.diagonalEsquerdo);
+				direcoes.add(Direcao.diagonalDireito);
+				direcoes.add(Direcao.diagonalEsquerdo);
 			}
 			dimensions = VerificarMovimentosLineares (peca, dimension, dimensions, direcoes);
 		}
@@ -63,22 +63,22 @@ public class AdaptadorDeMovimento {
 	}
 	
 	private ArrayList <Dimension> VerificarMovimentosLineares (Peca peca, Dimension dimension, ArrayList <Dimension> dimensions, 
-			ArrayList <Direção> direções) {
+			ArrayList <Direcao> direcoes) {
 		
 		Pino pino = peca.GetPino();
 		if (pino != null) {
-			Direção direçãoPino = pino.GetDireção();
-			if (!direções.contains(direçãoPino)) {
+			Direcao direcaoPino = pino.GetDirecao();
+			if (!direcoes.contains(direcaoPino)) {
 				return dimensions;
 			}
-			direções.clear();
-			direções.add(direçãoPino);
+			direcoes.clear();
+			direcoes.add(direcaoPino);
 		}
 		int jogador = peca.GetJogador();
 		int x = 0, y = 0;
-		for (int n = 0; n < direções.size(); n ++) {
+		for (int n = 0; n < direcoes.size(); n ++) {
 			
-			switch (direções.get(n)) {
+			switch (direcoes.get(n)) {
 			case diagonalDireito:
 				x = 1;
 				y = 1;
@@ -100,21 +100,21 @@ public class AdaptadorDeMovimento {
 			for (int i = 0; i < 2; i ++) {
 				ArrayList <Dimension> initialDimensions = new ArrayList <Dimension> ();
 				Dimension d = (Dimension) dimension.clone();
-				
+
 				while (d.width > 0 && d.width < 7 && d.height > 0 && d.height < 7) {
 					d.width += x;
 					d.height += y;
 					initialDimensions.add((Dimension)d.clone());
 				}
-				
-				boolean caminhoObstruído = false;
-				for (int j = 0; j < initialDimensions.size() && !caminhoObstruído; j ++) {
+
+				boolean caminhoObstruido = false;
+				for (int j = 0; j < initialDimensions.size() && !caminhoObstruido; j ++) {
 					d = initialDimensions.get(j);
 					try {
 						if (Tabuleiro.GetInstance().GetPosicaoPorDimension(d).GetPeca().GetJogador() != jogador) {
 							dimensions.add (d);
 						}
-						caminhoObstruído = true;
+						caminhoObstruido = true;
 					}
 					catch (Exception e) {
 						dimensions.add(d);
@@ -182,7 +182,7 @@ public class AdaptadorDeMovimento {
 							}
 							d.width += x;
 						}
-						//Checar por zonas de ameaça:
+						//Checar por zonas de ameaï¿½a:
 						if (caminhoLivre) {
 							d.width -= 2*x;
 							dimensions.add(d);
@@ -230,18 +230,18 @@ public class AdaptadorDeMovimento {
 		return initialDimensions;
 	}
 	
-	private ArrayList <Dimension> VerificarMovimentosDePeão (Peca peca, Dimension dimension, ArrayList <Dimension> dimensions) {
+	private ArrayList <Dimension> VerificarMovimentosDePeao (Peca peca, Dimension dimension, ArrayList <Dimension> dimensions) {
 
 		int jogador = peca.GetJogador ();
 		
-		ArrayList <Direção> direcoes = new ArrayList <Direção> ();
-		direcoes.add(Direção.diagonalDireito);
-		direcoes.add(Direção.diagonalEsquerdo);
-		direcoes.add(Direção.vertical);
+		ArrayList <Direcao> direcoes = new ArrayList <Direcao> ();
+		direcoes.add(Direcao.diagonalDireito);
+		direcoes.add(Direcao.diagonalEsquerdo);
+		direcoes.add(Direcao.vertical);
 		Pino pino = peca.GetPino();
 		if (pino != null) {
 			direcoes.clear();
-			direcoes.add(pino.GetDireção());
+			direcoes.add(pino.GetDirecao());
 		}
 		
 		ArrayList <Dimension> initialDimensions = new ArrayList <Dimension> ();
@@ -252,7 +252,7 @@ public class AdaptadorDeMovimento {
 			x = -1;
 			y = -1;
 		}		
-		if (direcoes.contains(Direção.vertical)) {
+		if (direcoes.contains(Direcao.vertical)) {
 			d = (Dimension) dimension.clone();
 			d.height += y;
 			
@@ -268,7 +268,7 @@ public class AdaptadorDeMovimento {
 			}			
 		}
 		
-		if (direcoes.contains(Direção.diagonalDireito)) {
+		if (direcoes.contains(Direcao.diagonalDireito)) {
 			d = (Dimension) dimension.clone();
 			d.height += y;
 			d.width += x;
@@ -282,7 +282,7 @@ public class AdaptadorDeMovimento {
 			}
 		}
 		
-		if (direcoes.contains(Direção.diagonalEsquerdo)) {
+		if (direcoes.contains(Direcao.diagonalEsquerdo)) {
 			d = (Dimension) dimension.clone();
 			d.height += y;
 			d.width -= x;
@@ -307,17 +307,17 @@ public class AdaptadorDeMovimento {
 		Rei rei = Tabuleiro.GetInstance().GetRei(jogador);
 		Dimension reiDimension = rei.GetPosicao().GetDimension();
 		int x = 0, y = 0;
-		Direção direção;
+		Direcao direcao;
 		
 		if (reiDimension.height == dimension.height) {
-			direção = Direção.horizontal;
+			direcao = Direcao.horizontal;
 			if (reiDimension.width > dimension.width) {
 				x = -1;
 			} else {
 				x = 1;
 			}
 		} else if (reiDimension.width == dimension.width){
-			direção = Direção.vertical;
+			direcao = Direcao.vertical;
 			if (reiDimension.height > dimension.height) {
 				y = -1;
 			} else {
@@ -334,9 +334,9 @@ public class AdaptadorDeMovimento {
 				y = 1;
 			}
 			if (x == 1 && y == 1 || x == -1 && y == -1) {
-				direção = Direção.diagonalDireito;
+				direcao = Direcao.diagonalDireito;
 			} else {
-				direção = Direção.diagonalEsquerdo;
+				direcao = Direcao.diagonalEsquerdo;
 			}
 		} else {
 			return;
@@ -356,13 +356,13 @@ public class AdaptadorDeMovimento {
 				if (p.GetJogador() == jogador) {
 					return;
 				} else {
-					if (direção == Direção.vertical || direção == Direção.horizontal) {
+					if (direcao == Direcao.vertical || direcao == Direcao.horizontal) {
 						if (p.getClass() == Torre.class || p.getClass() == Dama.class) {
-							peca.AddPino(new Pino (direção));
+							peca.AddPino(new Pino (direcao));
 						}
-					} else if (direção == Direção.diagonalDireito || direção == Direção.diagonalEsquerdo) {
+					} else if (direcao == Direcao.diagonalDireito || direcao == Direcao.diagonalEsquerdo) {
 						if (p.getClass() == Bispo.class || p.getClass() == Dama.class) {
-							peca.AddPino(new Pino (direção));
+							peca.AddPino(new Pino (direcao));
 						}
 					}
 					return;
@@ -451,8 +451,8 @@ public class AdaptadorDeMovimento {
 					initialDimensions.add((Dimension)d.clone());
 				}
 				
-				boolean caminhoObstruído = false;
-				for (int k = 0; k < initialDimensions.size() && !caminhoObstruído; k ++) {
+				boolean caminhoObstruido = false;
+				for (int k = 0; k < initialDimensions.size() && !caminhoObstruido; k ++) {
 					d = initialDimensions.get(k);					
 					p  = Tabuleiro.GetInstance().GetPosicaoPorDimension(d).GetPeca();
 					try {
@@ -460,7 +460,7 @@ public class AdaptadorDeMovimento {
 								|| p.getClass() == Torre.class && (i == 2 || i == 3))) {
 							return p;
 						}
-						caminhoObstruído = true;
+						caminhoObstruido = true;
 					}
 					catch (Exception e) {
 					}

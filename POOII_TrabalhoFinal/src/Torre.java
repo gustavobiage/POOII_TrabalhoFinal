@@ -5,6 +5,7 @@ public class Torre extends Peca implements DetectorDeMovimento {
 	
 	public Torre (Posicao posicao, int jogador) {
 		super(posicao, jogador);
+		this.informarNome("Torre");
 	}
 
 	@Override

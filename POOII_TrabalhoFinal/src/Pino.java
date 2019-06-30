@@ -1,13 +1,13 @@
 
 public class Pino {
 	
-	private Direção direção;
+	private Direcao direcao;
 	
-	public Pino (Direção direção) {
-		this.direção = direção;
+	public Pino (Direcao direcao) {
+		this.direcao = direcao;
 	}
 	
-	public Direção GetDireção () {
-		return direção;
+	public Direcao GetDirecao () {
+		return direcao;
 	}	
 }

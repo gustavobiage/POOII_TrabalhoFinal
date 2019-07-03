@@ -13,7 +13,7 @@ public class Tabuleiro {
 		tabuleiro = new Tabuleiro ();
 	}
 	
-	//Primeiro número largura do tabuleiro e segundo altura
+	//Primeiro nï¿½mero largura do tabuleiro e segundo altura
 	private Posicao [][] posicoes = new Posicao [8] [8];
 	private ArrayList <Peca> pecas = new ArrayList <Peca> ();
 	private ArrayList <Rei> reis = new ArrayList <Rei> ();
@@ -23,18 +23,11 @@ public class Tabuleiro {
 	
 	private Tabuleiro () {
 		
-		//Cria as posições
+		//Cria as posicoes
 		CriarTabuleiro ();
 		
-		//Cria as peças as quais irão ser linkadas a uma posição ao serem criadas
-		CriarPeças ();
-		
-		/*Remover linhas a seguir:*/
-		//pecas.add(new Cavalo (posicoes [3] [3], 1));
-		/*pecas.add(new Rei (posicoes [5] [5], 2));
-		pecas.add(new Dama (posicoes [3] [3], 1));*/
-		//posições[4][4].GetPeça().SetPino(new Pino (Direção.horizontal));
-		//VerificarMovimentos (new Dimension (4,4));
+		//Cria as pecas as quais irao ser linkadas a uma posicao ao serem criadas
+		CriarPecas ();
 	}
 	
 	//Percorre a matriz tabuleiro criando 
@@ -46,66 +39,107 @@ public class Tabuleiro {
 			}
 		}
 	}
-	
-	private void CriarPeças () {
+
+	private void CriarPecas () {
 		
-		for (int i = 0; i < 8; i ++) {
-			pecas.add(new Peao (posicoes [i] [1], 1));
-			pecas.add(new Peao (posicoes [i] [6], 2));
+		for (int i = 0; i < 2; i ++) {
+			for (int j = 0; j < 8; j ++) {
+				CriarPeca ("Peao", new Dimension (j, 1 + 5 * i), 1 + i);
+			}
+			
+			CriarPeca ("Torre", new Dimension (0, 7 * i), 1 + i);
+			CriarPeca ("Torre", new Dimension (7, 7 * i), 1 + i);
+			
+			CriarPeca ("Cavalo", new Dimension (1, 7 * i), 1 + i);
+			CriarPeca ("Cavalo", new Dimension (6, 7 * i), 1 + i);
+			
+			CriarPeca ("Bispo", new Dimension (2, 7 * i), 1 + i);
+			CriarPeca ("Bispo", new Dimension (5, 7 * i), 1 + i);
+			
+			CriarPeca ("Dama", new Dimension (3, 7 * i), i + 1);
+			
+			CriarPeca ("Rei", new Dimension (4, 7 * i), i + 1);
 		}
-		
-		pecas.add(new Torre (posicoes [0] [0], 1));
-		pecas.add(new Torre (posicoes [7] [0], 1));
-		pecas.add(new Torre (posicoes [0] [7], 2));
-		pecas.add(new Torre (posicoes [7] [7], 2));
-		
+	}
 
-		pecas.add(new Cavalo (posicoes [1] [0], 1));
-		pecas.add(new Cavalo (posicoes [6] [0], 1));
-		pecas.add(new Cavalo (posicoes [1] [7], 2));
-		pecas.add(new Cavalo (posicoes [6] [7], 2));
-		
-
-		pecas.add(new Bispo (posicoes [2] [0], 1));
-		pecas.add(new Bispo (posicoes [5] [0], 1));
-		pecas.add(new Bispo (posicoes [2] [7], 2));
-		pecas.add(new Bispo (posicoes [5] [7], 2));
-		
-
-		pecas.add(new Dama (posicoes [3] [0], 1));
-		pecas.add(new Dama (posicoes [3] [7], 2));	
-		
-		
-		reis.add(new Rei (posicoes [4] [0], 1));
-		reis.add(new Rei (posicoes [4] [7], 1));
-		pecas.add(reis.get(0));
-		pecas.add(reis.get(1));
+	private void CriarPeca (String tipo, Dimension dimension, int jogador) {
+		if (GetPosicaoPorDimension (dimension).GetPeca() != null) {
+			System.err.println("Tentando criar peca em um local ja ocupado.");
+			return;
+		}
+		Peca peca;
+		switch (tipo) {
+		case "Rei":
+			peca = new Rei (GetPosicaoPorDimension (dimension), jogador);
+			reis.add((Rei) peca);
+			break;
+		case "Dama":
+			peca = new Dama (GetPosicaoPorDimension (dimension), jogador);
+			break;
+		case "Bispo":
+			peca = new Bispo (GetPosicaoPorDimension (dimension), jogador);
+			break;
+		case "Cavalo":
+			peca = new Cavalo (GetPosicaoPorDimension (dimension), jogador);
+			break;
+		case "Torre":
+			peca = new Torre (GetPosicaoPorDimension (dimension), jogador);
+			break;
+		default:
+			peca = new Peao (GetPosicaoPorDimension (dimension), jogador);
+			break;
+		}
+		pecas.add(peca);
 	}
 	
-	CriarPeca (Tipo tipo, Posicao posicao) {
-		
-	}
-	
-	//Retorna a posição de uma coordenada
+	//Retorna a posiï¿½ï¿½o de uma coordenada
 	public Posicao GetPosicaoPorDimension (Dimension d) {
 		return posicoes [d.width] [d.height];
 	}
 	
-	public void VerificarMovimentos (Dimension posicaoInicial) {
-		//Ocorre ao clicar na peça e demonstra os possíveis movimentos com a peça
+	public ArrayList<Posicao> VerificarMovimentos (Dimension posicaoInicial) {
+		//Ocorre ao clicar na peï¿½a e demonstra os possï¿½veis movimentos com a peï¿½a
 		Peca pecaAtual = GetPosicaoPorDimension(posicaoInicial).GetPeca();
 		ArrayList <Dimension> dimensions = AdaptadorDeMovimento.GetInstance().AdaptarMovimentos(pecaAtual, posicaoInicial);
-		for (Dimension d: dimensions) {
-			Hightlight (d);
+//		for (Dimension d: dimensions) {
+//			Hightlight (d);
+//		}
+
+		ArrayList<Posicao> posssiveisMovimentos = new ArrayList<>();
+		for(int i = 0; i < dimensions.size(); i++) {
+			posssiveisMovimentos.add(GetPosicaoPorDimension(dimensions.get(i)));
 		}
+
+		return posssiveisMovimentos;
 	}
 	
 	public void MoverPeca (Peca peca, Dimension dimension) {
 		//TODO Pegar Historico.escreverHistorico(peca.GetDimension(), dimension);
+		
+		//Movimento de Rock
+		if (peca.getClass() == Rei.class && (Math.abs(dimension.width-peca.GetPosicao().GetDimension().width) > 1)) {
+			Torre torre;
+			Dimension destinoDaTorre = (Dimension) dimension.clone();
+			if (dimension.width < peca.GetPosicao().GetDimension().width) {
+				torre = (Torre) GetPosicaoPorDimension (new Dimension (0, 7 * (jogadorAtual - 1))).GetPeca();
+				destinoDaTorre.width++;
+			} else {
+				torre = (Torre) GetPosicaoPorDimension (new Dimension (7, 7 * (jogadorAtual - 1))).GetPeca();
+				destinoDaTorre.width--;
+			}
+			MoverPecaSemRestricoes(torre, destinoDaTorre);
+			torre.TornarAtiva();
+		}
+		
 		Posicao posicao = GetPosicaoPorDimension (dimension);
 		pecas.remove(posicao.GetPeca());
 		peca.Mover(posicao);
 		ProximoTurno ();
+		try {
+			((DetectorDeMovimento) peca).TornarAtiva();
+		}
+		catch (Exception e) {
+		}
 	}
 	
 	public void MoverPecaSemRestricoes (Peca peca, Dimension dimension) {
@@ -132,6 +166,10 @@ public class Tabuleiro {
 	private void RecriarPeca (Peca pecaRemovida) {
 		pecas.add(pecaRemovida);
 		pecaRemovida.Mover(pecaRemovida.GetPosicao());
+	}
+	
+	public int getTurno() {
+		return turno;
 	}
 	
 	private void ProximoTurno () {
@@ -197,17 +235,25 @@ public class Tabuleiro {
 	public Peca GetPecaCheque () {
 		return pecaCheque;
 	}
-	
-	public void Hightlight (Dimension dimension) {
-		System.out.print(dimension.width + "," + dimension.height + "  ");
+
+	public Posicao[][] getPosicoes() {
+		return Tabuleiro.transposedMatrix(posicoes);
 	}
-	
-	public void RemoveHightlights () {
-		//Remove o highlight dos quadrados que estiverem com hightlight
+
+	public static Posicao[][] transposedMatrix(Posicao[][] posicoes) {
+		Posicao[][] posicoesT = new Posicao[8][8];
+
+		for(int i = 0; i < 8; i++) {
+			for(int j = 0; j < 8; j++) {
+				posicoesT[i][j] = posicoes[j][i];
+			}
+		}
+
+		return posicoesT;
 	}
-	
-	/*Remover os métodos a seguir:*/
-	
+
+	/*Remover os metodos a seguir:*/
+
 	public void MostrarTabuleiro () {
 		for (int i = 0; i < posicoes.length; i++) {
 			for (int j = 0; j < posicoes[1].length; j++) {
@@ -216,8 +262,5 @@ public class Tabuleiro {
 			System.out.println();
 		}
 		
-	}
-	
-	public static void main (String args []) {
 	}
 }

@@ -5,6 +5,7 @@ public class Rei extends Peca implements DetectorDeMovimento {
 	
 	public Rei(Posicao posicao, int jogador) {
 		super(posicao, jogador);
+		this.informarNome("Rei");
 	}
 
 	@Override

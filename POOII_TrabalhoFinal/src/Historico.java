@@ -56,7 +56,7 @@ public class Historico {
 //            linha = jogada.pegarPosicaoAtual().GetPeca().pegarNome().charAt(0) + " " + jogada.pegarPosicaoAtual().GetDimension().width + " " + jogada.pegarPosicaoAtual().GetDimension().height
 //                    + " " + jogada.pegarPosicaoNova().GetPeca().pegarNome().charAt(0) + " " + jogada.pegarPosicaoNova().GetDimension().width + " " + jogada.pegarPosicaoNova().GetDimension().height + "\n";
             linha = jogada.pegarPosicaoAtual().GetDimension().width + " " + jogada.pegarPosicaoAtual().GetDimension().height + " "
-                    + jogada.pegarPosicaoNova().GetDimension().width + " " + jogada.pegarPosicaoNova().GetDimension().height;
+                    + jogada.pegarPosicaoNova().GetDimension().width + " " + jogada.pegarPosicaoNova().GetDimension().height + "\n";
             GestaoArquivoTexto.exreverProximaLinha(linha);
         }
         GestaoArquivoTexto.fecharArquivo();
@@ -79,8 +79,8 @@ public class Historico {
             i2 = linha.charAt(2) - '0';
 
 //            p2 = linha.charAt(5);
-            j1 = linha.charAt(3) - '0';
-            j2 = linha.charAt(4) - '0';
+            j1 = linha.charAt(4) - '0';
+            j2 = linha.charAt(6) - '0';
 
 //            jogadas[posBusca] = Jogada.indentificarJogada(p1, i1, i2, p2, i2, j2);
 

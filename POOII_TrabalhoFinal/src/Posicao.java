@@ -63,4 +63,9 @@ public class Posicao extends JButton {
 
         return posicao;
     }
+
+    public static Dimension posicaoTransposta(Posicao posicao) {
+        return new Dimension(posicao.GetDimension().height
+                , posicao.GetDimension().width);
+    }
 }

@@ -25,7 +25,12 @@ public class Peao extends Peca implements DetectorDeMovimento {
 			Evoluir ();
 		}
 	}
-	
+
+	@Override
+	public void Desativar() {
+		ativa = false;
+	}
+
 	private void Evoluir () {
 		//Apaga o pe�o e cria uma nova pe�a no local.
 	}

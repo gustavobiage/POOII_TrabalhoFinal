@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TabuleiroFrame extends JFrame {
+public class TabuleiroFrame extends JPanel {
 
     private Map<JButton, Posicao> encontrar_posicao= new HashMap<>();
     JButton[][] posicoes_clicavel;
@@ -43,7 +43,8 @@ public class TabuleiroFrame extends JFrame {
 
                 posicao = matrix[i][j];
                 posicoes_clicavel[i][j] = new JButton("");
-
+                posicoes_clicavel[i][j].setPreferredSize(new Dimension(57,57));
+                posicoes_clicavel[i][j].setMaximumSize(new Dimension(57,57));
                 encontrar_posicao.put(posicoes_clicavel[i][j], matrix[i][j]);
 
                 String caminho_imagem;
@@ -192,7 +193,7 @@ public class TabuleiroFrame extends JFrame {
         }
 
 //        this.add(new JButton("HEHEH"));
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+//        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
 
 //        for(int i = 0; i < 8; i++) {
@@ -240,8 +241,9 @@ public class TabuleiroFrame extends JFrame {
         objeto = objeto.toLowerCase();
 
         try {
-
+            System.out.print(objeto + "-");
             String caminho_imagem = gestaoImagem.pegarCaminhoObjeto(objeto);
+            System.out.println(caminho_imagem);
             File icone = new File(caminho_imagem);
             BufferedImage bufferedImage = ImageIO.read(icone);
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -255,5 +257,27 @@ public class TabuleiroFrame extends JFrame {
             e.printStackTrace();
         }
     }
+
+    public void revisarTodo() {
+        Posicao[][] posicoes = Tabuleiro.GetInstance().getPosicoes();
+        encontrar_posicao.clear();
+        for(int i = 0; i < 8; i++) {
+            for(int j = 0; j < 8; j++) {
+                desgrifarQuadrado(i, j, posicoes);
+                encontrar_posicao.put(posicoes_clicavel[i][j], posicoes[i][j]);
+            }
+        }
+    }
+
+    public void revizarTabuleiro() {
+        Posicao[][] posicoes = Tabuleiro.GetInstance().getPosicoes();
+        encontrar_posicao.clear();
+        for(int i = 0; i < 8; i++) {
+            for(int j = 0; j < 8; j++) {
+                encontrar_posicao.put(posicoes_clicavel[i][j], posicoes[i][j]);
+            }
+        }
+    }
+
 
 }

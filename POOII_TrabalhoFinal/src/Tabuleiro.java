@@ -8,7 +8,7 @@ public class Tabuleiro {
 	public static Tabuleiro GetInstance () {
 		return tabuleiro;
 	}
-	
+
 	public static void novaInstancia() {
 		tabuleiro = new Tabuleiro ();
 	}
@@ -20,7 +20,8 @@ public class Tabuleiro {
 	private int turno = 1;
 	private int jogadorAtual = 1;
 	private Peca pecaCheque = null;
-	
+	private Historico historico;
+
 	private Tabuleiro () {
 		
 		//Cria as posicoes
@@ -29,10 +30,15 @@ public class Tabuleiro {
 		//Cria as pecas as quais irao ser linkadas a uma posicao ao serem criadas
 		CriarPecas ();
 	}
-	
+
+	public void informarHistorico(Historico historico) {
+		this.historico = historico;
+	}
+
 	//Percorre a matriz tabuleiro criando 
 	private void CriarTabuleiro () {
-		
+		posicoes = new Posicao[8][8];
+
 		for (int i = 0; i < posicoes[0].length; i++) {
 			for (int j = 0; j < posicoes[1].length; j ++) {
 				posicoes[i][j] = new Posicao (i, j);
@@ -115,7 +121,9 @@ public class Tabuleiro {
 	
 	public void MoverPeca (Peca peca, Dimension dimension) {
 		//TODO Pegar Historico.escreverHistorico(peca.GetDimension(), dimension);
-		
+		Posicao nova = this.GetPosicaoPorDimension(dimension);
+		historico.escreverHistorico(peca.GetPosicao(), nova);
+
 		//Movimento de Rock
 		if (peca.getClass() == Rei.class && (Math.abs(dimension.width-peca.GetPosicao().GetDimension().width) > 1)) {
 			Torre torre;
@@ -141,7 +149,57 @@ public class Tabuleiro {
 		catch (Exception e) {
 		}
 	}
-	
+
+	public void voltarJogada(Jogada jogada, TabuleiroFrame frame) {
+//		Posicao posicao1 = this.GetPosicaoPorDimension(Posicao.posicaoTransposta(jogada.pegarPosicaoAtual()));
+		Posicao posicao1 = jogada.pegarPosicaoAtual();
+		Posicao posicao2 = this.GetPosicaoPorDimension(Posicao.posicaoTransposta(jogada.pegarPosicaoNova()));
+
+//		Peca peca_pos1 = this.GetPosicaoPorDimension(posicao1.GetDimension()).GetPeca();
+
+		Peca peca = this.GetPosicaoPorDimension(Posicao.posicaoTransposta(posicao2)).GetPeca();
+		this.MoverPecaSemRestricoes(peca, new Dimension(posicao1.GetDimension().width, posicao1.GetDimension().height));
+		peca = this.GetPosicaoPorDimension(posicao1.GetDimension()).GetPeca();
+
+		if(peca instanceof Peao && ((posicao1.GetDimension().height == 1 && peca.pegarLado()== Peca.Lado.BRANCAS) || (posicao1.GetDimension().height == 6 && peca.pegarLado()==Peca.Lado.PRETAS))) {
+			((Peao) peca).Desativar();
+		}
+		try {
+
+			Peca reviver = jogada.pegarPosicaoNova().GetPeca();
+			String object = "";
+			if(reviver instanceof Rei) {
+				object = "Rei";
+			} else if(reviver instanceof Dama) {
+				object = "Dama";
+			} else if(reviver instanceof Peao) {
+				object = "Peao";
+
+			} else if(reviver instanceof Torre) {
+				object = "Torre";
+
+			} else if(reviver instanceof Bispo) {
+				object = "Bispo";
+
+			} else if(reviver instanceof Cavalo) {
+				object = "Cavalo";
+			}
+
+			this.CriarPeca(object, Posicao.posicaoTransposta(posicao2), reviver.GetJogador());
+
+		} catch (NullPointerException e) {
+			System.out.println("Nenhuma peca foi revivida");
+		}
+
+		//TODO checar se devemos trocar width com height
+//		frame.desgrifarQuadrado(posicao1.GetDimension().width, posicao1.GetDimension().height, this.transposedMatrix(this.posicoes));
+		frame.desgrifarQuadrado(posicao1.GetDimension().height, posicao1.GetDimension().width, this.transposedMatrix(this.posicoes));
+		frame.desgrifarQuadrado(posicao2.GetDimension().width, posicao2.GetDimension().height, this.transposedMatrix(this.posicoes));
+		frame.desgrifarQuadrado(posicao2.GetDimension().height, posicao2.GetDimension().width, this.transposedMatrix(this.posicoes));
+
+		this.turnoAnterior();
+	}
+
 	public void MoverPecaSemRestricoes (Peca peca, Dimension dimension) {
 		Posicao posicao = GetPosicaoPorDimension (dimension);
 		peca.Mover(posicao);
@@ -171,7 +229,14 @@ public class Tabuleiro {
 	public int getTurno() {
 		return turno;
 	}
-	
+
+	private void turnoAnterior() {
+		turno --;
+		AlternarJogador ();
+		VerificarCheque ();
+		VerificarFimDeJogo ();
+	}
+
 	private void ProximoTurno () {
 		turno ++;
 		AlternarJogador ();

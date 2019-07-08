@@ -17,4 +17,7 @@ public class Rei extends Peca implements DetectorDeMovimento {
 	public boolean JaMoveu() {
 		return ativa;
 	}
+
+	@Override
+	public void Desativar() {ativa = false;}
 }

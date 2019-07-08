@@ -18,4 +18,8 @@ public class Torre extends Peca implements DetectorDeMovimento {
 		return ativa;
 	}
 
+	@Override
+	public void Desativar() { ativa = false;}
+
+
 }

@@ -60,7 +60,7 @@ public class GestaoImagem {
 
         //  cavalo
         repositorio_imagem.put("cavalo_pretas_quadrado_claro", "Imagens/cavalo_pretas_quadrado_claro.jpg");
-        repositorio_imagem.put("cavalo_pretas_quadrado_claro_escuro", "Imagens/cavalo_pretas_quadrado_claro_escuro.jpg");
+        repositorio_imagem.put("cavalo_pretas_quadrado_claro_grifada", "Imagens/cavalo_pretas_quadrado_claro_grifada.jpg");
         repositorio_imagem.put("cavalo_pretas_quadrado_escuro", "Imagens/cavalo_pretas_quadrado_escuro.jpg");
         repositorio_imagem.put("cavalo_pretas_quadrado_escuro_grifada", "Imagens/cavalo_pretas_quadrado_escuro_grifada.jpg");
 

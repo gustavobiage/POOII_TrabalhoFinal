@@ -13,13 +13,15 @@ import javax.swing.*;
 
 
 public class Menu2 extends JFrame {
+	
 	Menu2 frame;
 	JButton botaoBispo, botaoDama, botaoTorre, botaoCavalo;
+	
 	Peca.Lado l;
 	public Menu2(Peca.Lado lado, Dimension dimension) {
 		l = lado;
 		frame = this;
-
+		
 		Container cont1 = new Container();
 		cont1.setLayout(new FlowLayout());
 
@@ -30,8 +32,8 @@ public class Menu2 extends JFrame {
 		botaoBispo.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(l == Peca.Lado.BRANCAS) Tabuleiro.GetInstance().evoluitPeao(dimension, "Bispo", 1, TabuleiroFrame.getLastInstance());
-				else Tabuleiro.GetInstance().evoluitPeao(dimension, "Bispo", 2, TabuleiroFrame.getLastInstance());
+				if(l == Peca.Lado.BRANCAS) Tabuleiro.GetInstance().evoluirPeao(dimension, "Bispo", 1, TabuleiroFrame.GetInstance());
+				else Tabuleiro.GetInstance().evoluirPeao(dimension, "Bispo", 2, TabuleiroFrame.GetInstance());
 				frame.closeWindown();
 			}
 		});
@@ -42,8 +44,8 @@ public class Menu2 extends JFrame {
 		botaoCavalo.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(l == Peca.Lado.BRANCAS) Tabuleiro.GetInstance().evoluitPeao(dimension, "Cavalo", 1, TabuleiroFrame.getLastInstance());
-				else Tabuleiro.GetInstance().evoluitPeao(dimension, "Cavalo", 2, TabuleiroFrame.getLastInstance());
+				if(l == Peca.Lado.BRANCAS) Tabuleiro.GetInstance().evoluirPeao(dimension, "Cavalo", 1, TabuleiroFrame.GetInstance());
+				else Tabuleiro.GetInstance().evoluirPeao(dimension, "Cavalo", 2, TabuleiroFrame.GetInstance());
 				frame.closeWindown();
 			}
 		});
@@ -54,8 +56,8 @@ public class Menu2 extends JFrame {
 		botaoTorre.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(l == Peca.Lado.BRANCAS) Tabuleiro.GetInstance().evoluitPeao(dimension, "Torre", 1, TabuleiroFrame.getLastInstance());
-				else Tabuleiro.GetInstance().evoluitPeao(dimension, "Torre", 2, TabuleiroFrame.getLastInstance());
+				if(l == Peca.Lado.BRANCAS) Tabuleiro.GetInstance().evoluirPeao(dimension, "Torre", 1, TabuleiroFrame.GetInstance());
+				else Tabuleiro.GetInstance().evoluirPeao(dimension, "Torre", 2, TabuleiroFrame.GetInstance());
 				frame.closeWindown();
 			}
 		});
@@ -66,8 +68,8 @@ public class Menu2 extends JFrame {
 		botaoDama.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(l == Peca.Lado.BRANCAS) Tabuleiro.GetInstance().evoluitPeao(dimension, "Dama", 1, TabuleiroFrame.getLastInstance());
-				else Tabuleiro.GetInstance().evoluitPeao(dimension, "Dama", 2, TabuleiroFrame.getLastInstance());
+				if(l == Peca.Lado.BRANCAS) Tabuleiro.GetInstance().evoluirPeao(dimension, "Dama", 1, TabuleiroFrame.GetInstance());
+				else Tabuleiro.GetInstance().evoluirPeao(dimension, "Dama", 2, TabuleiroFrame.GetInstance());
 				frame.closeWindown();
 			}
 		});
@@ -76,13 +78,15 @@ public class Menu2 extends JFrame {
 		cont1.add(botaoDama);
 		cont1.add(botaoTorre);
 		cont1.add(botaoCavalo);
-
+		
+		
 		add(cont1);
 		cont1.setSize(300, 100);
 		setSize(300,110);
 		setVisible(true);
+				
 	}
-
+	
 	public void closeWindown() {
 		this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
 	}
@@ -100,10 +104,4 @@ public class Menu2 extends JFrame {
 			e.printStackTrace();
 		}
 	}
-
-	//For test only
-//	public static void main(String[] args) {
-//		Menu2 menu2 = new Menu2(Peca.Lado.BRANCAS, new Dimension(0, 0));
-//		menu2.setDefaultCloseOperation(EXIT_ON_CLOSE);
-//	}
 }

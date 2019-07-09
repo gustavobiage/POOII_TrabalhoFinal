@@ -26,8 +26,9 @@ public class Peao extends Peca {
 	}
 
 	private void Evoluir () {
-		posicao.RemoverPeca();
-		Tabuleiro.GetInstance().RemoverPecaDaLista(this);
-		Tabuleiro.GetInstance().CriarPeca("Dama", posicao.GetDimension(), jogador);
+//		posicao.RemoverPeca();
+//		Tabuleiro.GetInstance().RemoverPecaDaLista(this);
+//		Tabuleiro.GetInstance().CriarPeca("Dama", posicao.GetDimension(), jogador);
+//		Menu2 m2 = new Menu2(this.pegarLado(), this.GetPosicao().GetDimension());
 	}
 }

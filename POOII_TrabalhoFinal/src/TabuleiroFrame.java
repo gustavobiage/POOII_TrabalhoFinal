@@ -19,20 +19,23 @@ public class TabuleiroFrame extends JPanel {
     private GestaoImagem gestaoImagem;
     Posicao posicaoSelecionada;
     ArrayList<Posicao> possiveis_movimentos;
-
+    static TabuleiroFrame tabuleiroFrame;
+    
+    public static TabuleiroFrame GetInstance () {
+    	return tabuleiroFrame;
+    }
+    
+    
     public Posicao pegarPosicaoPorBotao(JButton botao) {
         return encontrar_posicao.get(botao);
     }
 
-    private static TabuleiroFrame lastFrame;
+    public TabuleiroFrame() {
 
-    public static TabuleiroFrame getLastInstance() {
-        return lastFrame;
-    }
-
-    public TabuleiroFrame(Posicao[][] matrix) {
-        lastFrame = this;
-
+    	tabuleiroFrame = this;
+    	
+    	Posicao[][] matrix = Tabuleiro.GetInstance().getPosicoes();
+    	
         setLayout(new GridLayout(8, 8));
         setSize(new Dimension(500, 500));
 
@@ -40,8 +43,6 @@ public class TabuleiroFrame extends JPanel {
 
         Container tabuleiro = new Container();
         tabuleiro.setLayout(new GridLayout(8, 8));
-
-        int selecionador_fundo = 0;
 
         gestaoImagem = new GestaoImagem();
         Posicao posicao;
@@ -57,7 +58,6 @@ public class TabuleiroFrame extends JPanel {
                 String caminho_imagem;
                 if(posicao.GetPeca() != null) caminho_imagem = gestaoImagem.pegarCaminhoObjeto((posicao.GetPeca().pegarNome() + "_quadrado_" +  posicao.pegarQuadrado()).toLowerCase());
                 else caminho_imagem = gestaoImagem.pegarCaminhoObjeto(("quadrado_" +  posicao.pegarQuadrado()).toLowerCase());
-                //                caminho_imagem = caminho_imagem.toLowerCase();
                 try {
 
                     File icone = new File(caminho_imagem);
@@ -66,8 +66,6 @@ public class TabuleiroFrame extends JPanel {
 
                     ImageIO.write(bufferedImage, caminho_imagem.substring(caminho_imagem.length()-3, caminho_imagem.length()), byteArrayOutputStream);
                     byte[] dados_imagem = byteArrayOutputStream.toByteArray();
-//                    Image imagem_icone = new ImageIcon(dados_imagem).getImage().getScaledInstance(57, 57, Image.SCALE_DEFAULT);
-//                    imagem_icone.getScaledInstance()
                     posicoes_clicavel[i][j].setIcon(new ImageIcon(bufferedImage.getScaledInstance(57,57, Image.SCALE_DEFAULT)));
 
                     posicoes_clicavel[i][j].addActionListener(new ActionListener() {
@@ -194,49 +192,17 @@ public class TabuleiroFrame extends JPanel {
                 } finally {
                     this.add(posicoes_clicavel[i][j], i, j);
                 }
-
-                selecionador_fundo++;
             }
         }
-
-//        this.add(new JButton("HEHEH"));
-//        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        
         setVisible(true);
-
-//        for(int i = 0; i < 8; i++) {
-//            for(int j = 0; j < 8; j++) {
-//                this.grifarQuadrado(i, j, matrix);
-//            }
-//        }
     }
-
-    public void desgrifarQuadradoPeloTabuleiro (int i, int j, Posicao[][] matrix) {
-        String objeto = new String();
-        if(matrix[i][j].GetPeca() != null) {
-            objeto += matrix[i][j].GetPeca().pegarNome()+"_";
-        }
-
-        objeto += "quadrado_" + matrix[i][j].pegarQuadrado().toString();
-        objeto = objeto.toLowerCase();
-
-        try {
-
-            String caminho_imagem = gestaoImagem.pegarCaminhoObjeto(objeto);
-            File icone = new File(caminho_imagem);
-            BufferedImage bufferedImage = ImageIO.read(icone);
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
-            ImageIO.write(bufferedImage, caminho_imagem.substring(caminho_imagem.length()-3, caminho_imagem.length()), byteArrayOutputStream);
-            byte[] dados_imagem = byteArrayOutputStream.toByteArray();
-
-            posicoes_clicavel[j][i].setIcon(new ImageIcon(bufferedImage.getScaledInstance(57,57, Image.SCALE_DEFAULT)));
-            matrix[j][i].informarGrifada(false);
-            matrix[i][j].informarGrifada(false);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    
+    public void DesgrifarQuadrados () {
+    	for (Posicao p: possiveis_movimentos) {
+    		desgrifarQuadrado (p.GetDimension().height, p.GetDimension().width, Tabuleiro.GetInstance().getPosicoes());
+    	}
     }
-
 
     public void desgrifarQuadrado(int i, int j, Posicao[][] matrix) {
         String objeto = new String();
@@ -264,6 +230,33 @@ public class TabuleiroFrame extends JPanel {
         }
 
     }
+    
+    public void desgrifarQuadradoPeloTabuleiro (int i, int j, Posicao[][] matrix) {
+        String objeto = new String();
+        if(matrix[i][j].GetPeca() != null) {
+            objeto += matrix[i][j].GetPeca().pegarNome()+"_";
+        }
+
+        objeto += "quadrado_" + matrix[i][j].pegarQuadrado().toString();
+        objeto = objeto.toLowerCase();
+
+        try {
+
+            String caminho_imagem = gestaoImagem.pegarCaminhoObjeto(objeto);
+            File icone = new File(caminho_imagem);
+            BufferedImage bufferedImage = ImageIO.read(icone);
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+            ImageIO.write(bufferedImage, caminho_imagem.substring(caminho_imagem.length()-3, caminho_imagem.length()), byteArrayOutputStream);
+            byte[] dados_imagem = byteArrayOutputStream.toByteArray();
+
+            posicoes_clicavel[j][i].setIcon(new ImageIcon(bufferedImage.getScaledInstance(57,57, Image.SCALE_DEFAULT)));
+            matrix[j][i].informarGrifada(false);
+            matrix[i][j].informarGrifada(false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void grifarQuadrado(int i, int j, Posicao[][] matrix) {
 
@@ -276,9 +269,7 @@ public class TabuleiroFrame extends JPanel {
         objeto = objeto.toLowerCase();
 
         try {
-            System.out.print(objeto + "-");
             String caminho_imagem = gestaoImagem.pegarCaminhoObjeto(objeto);
-            System.out.println(caminho_imagem);
             File icone = new File(caminho_imagem);
             BufferedImage bufferedImage = ImageIO.read(icone);
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -304,7 +295,7 @@ public class TabuleiroFrame extends JPanel {
         }
     }
 
-    public void revizarTabuleiro() {
+    public void revisarTabuleiro() {
         Posicao[][] posicoes = Tabuleiro.GetInstance().getPosicoes();
         encontrar_posicao.clear();
         for(int i = 0; i < 8; i++) {

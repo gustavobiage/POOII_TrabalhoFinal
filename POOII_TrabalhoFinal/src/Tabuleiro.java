@@ -68,7 +68,7 @@ public class Tabuleiro {
 		}
 	}
 
-	private void CriarPeca (String tipo, Dimension dimension, int jogador) {
+	public void CriarPeca (String tipo, Dimension dimension, int jogador) {
 		if (GetPosicaoPorDimension (dimension).GetPeca() != null) {
 			System.err.println("Tentando criar peca em um local ja ocupado.");
 			return;
@@ -98,18 +98,19 @@ public class Tabuleiro {
 		pecas.add(peca);
 	}
 	
-	//Retorna a posi��o de uma coordenada
+	//Retorna a posicao de uma coordenada
 	public Posicao GetPosicaoPorDimension (Dimension d) {
 		return posicoes [d.width] [d.height];
 	}
 	
+	public Jogada GetUltimaJogada () {
+		return historico.GetUltimaJogada();
+	}
+	
 	public ArrayList<Posicao> VerificarMovimentos (Dimension posicaoInicial) {
-		//Ocorre ao clicar na pe�a e demonstra os poss�veis movimentos com a pe�a
+		//Ocorre ao clicar na peca e demonstra os posiveis movimentos com a peca
 		Peca pecaAtual = GetPosicaoPorDimension(posicaoInicial).GetPeca();
 		ArrayList <Dimension> dimensions = AdaptadorDeMovimento.GetInstance().AdaptarMovimentos(pecaAtual, posicaoInicial);
-//		for (Dimension d: dimensions) {
-//			Hightlight (d);
-//		}
 
 		ArrayList<Posicao> posssiveisMovimentos = new ArrayList<>();
 		for(int i = 0; i < dimensions.size(); i++) {
@@ -121,11 +122,14 @@ public class Tabuleiro {
 	
 	public void MoverPeca (Peca peca, Dimension dimension) {
 		//TODO Pegar Historico.escreverHistorico(peca.GetDimension(), dimension);
-		Posicao nova = this.GetPosicaoPorDimension(dimension);
-		historico.escreverHistorico(peca.GetPosicao(), nova);
-
-		//Movimento de Rock
+		String tipoDeJogada = "normal";
+		Posicao antigaPosicao = peca.GetPosicao();
+		Posicao posicao = GetPosicaoPorDimension (dimension);
+		Peca pecaDestruida = posicao.GetPeca();
+		
+		//Movimento de Roque
 		if (peca.getClass() == Rei.class && (Math.abs(dimension.width-peca.GetPosicao().GetDimension().width) > 1)) {
+			tipoDeJogada = "roque";
 			Torre torre;
 			Dimension destinoDaTorre = (Dimension) dimension.clone();
 			if (dimension.width < peca.GetPosicao().GetDimension().width) {
@@ -137,67 +141,125 @@ public class Tabuleiro {
 			}
 			MoverPecaSemRestricoes(torre, destinoDaTorre);
 			torre.TornarAtiva();
+			torre.AdicionarMovimento();
+			((Rei) peca).AdicionarMovimento();
+			
+		} else if (peca.getClass() == Torre.class) {
+			((Torre) peca).AdicionarMovimento();
+		} else if (peca.getClass() == Rei.class) {
+			((Rei) peca).AdicionarMovimento();
 		}
 		
-		Posicao posicao = GetPosicaoPorDimension (dimension);
-		pecas.remove(posicao.GetPeca());
+		//Movimentos Especiais de Peao
+		if (peca.getClass() == Peao.class) {
+			if (((Peao)peca).ChecarEvolucao()) {
+				tipoDeJogada = "evolucao";
+			} else if (((Peao) peca).ChecarEnPassant(posicao)) {
+				tipoDeJogada = "en passant";
+				Dimension d = (Dimension) dimension.clone();
+				if (peca.GetJogador() == 1) {
+					d.height -= 1;
+				} else {
+					d.height += 1;
+				}
+				pecaDestruida = GetPosicaoPorDimension (d).GetPeca();
+			}
+		}
+		
+		if (pecaDestruida != null) {
+			Posicao p = pecaDestruida.GetPosicao();
+			TabuleiroFrame frame = TabuleiroFrame.GetInstance();
+			p.RemoverPeca();
+			frame.desgrifarQuadrado(p.GetDimension().width, p.GetDimension().height, transposedMatrix(this.posicoes));
+			frame.desgrifarQuadrado(p.GetDimension().height, p.GetDimension().width, transposedMatrix(this.posicoes));
+		}
 		peca.Mover(posicao);
+		pecas.remove(pecaDestruida);
+		historico.escreverHistorico(antigaPosicao, peca.GetPosicao(), tipoDeJogada, pecaDestruida);
 		ProximoTurno ();
-		try {
-			((DetectorDeMovimento) peca).TornarAtiva();
-		}
-		catch (Exception e) {
-		}
+	}
+	
+	public void RemoverPecaDaLista (Peca peca) {
+		pecas.remove(peca);
 	}
 
-	public void voltarJogada(Jogada jogada, TabuleiroFrame frame) {
-//		Posicao posicao1 = this.GetPosicaoPorDimension(Posicao.posicaoTransposta(jogada.pegarPosicaoAtual()));
-		Posicao posicao1 = jogada.pegarPosicaoAtual();
-		Posicao posicao2 = this.GetPosicaoPorDimension(Posicao.posicaoTransposta(jogada.pegarPosicaoNova()));
+	public void voltarJogada(Jogada jogada) {
+		
+		System.out.println(GetPosicaoPorDimension(new Dimension (5,7)).GetPeca());
+		
+		TabuleiroFrame.GetInstance().DesgrifarQuadrados ();
 
-//		Peca peca_pos1 = this.GetPosicaoPorDimension(posicao1.GetDimension()).GetPeca();
+		Posicao posicaoAtual = jogada.pegarPosicaoNova();
+		Posicao posicaoParaRetorno = jogada.pegarPosicaoAtual();
 
-		Peca peca = this.GetPosicaoPorDimension(Posicao.posicaoTransposta(posicao2)).GetPeca();
-		this.MoverPecaSemRestricoes(peca, new Dimension(posicao1.GetDimension().width, posicao1.GetDimension().height));
-		peca = this.GetPosicaoPorDimension(posicao1.GetDimension()).GetPeca();
-
-		if(peca instanceof Peao && ((posicao1.GetDimension().height == 1 && peca.pegarLado()== Peca.Lado.BRANCAS) || (posicao1.GetDimension().height == 6 && peca.pegarLado()==Peca.Lado.PRETAS))) {
-			((Peao) peca).Desativar();
-		}
-		try {
-
-			Peca reviver = jogada.pegarPosicaoNova().GetPeca();
-			String object = "";
-			if(reviver instanceof Rei) {
-				object = "Rei";
-			} else if(reviver instanceof Dama) {
-				object = "Dama";
-			} else if(reviver instanceof Peao) {
-				object = "Peao";
-
-			} else if(reviver instanceof Torre) {
-				object = "Torre";
-
-			} else if(reviver instanceof Bispo) {
-				object = "Bispo";
-
-			} else if(reviver instanceof Cavalo) {
-				object = "Cavalo";
+		Peca peca = posicaoAtual.GetPeca();
+		
+		System.out.println(peca);
+		
+		if (jogada.GetTipoDeJogada() == "evolucao") {
+			Dimension d = posicaoAtual.GetDimension();
+			GetPosicaoPorDimension(d).RemoverPeca();
+			RemoverPecaDaLista(peca);
+			CriarPeca("Peao", d, peca.GetJogador());
+			peca = GetPosicaoPorDimension(d).GetPeca();
+			
+		} else if (jogada.GetTipoDeJogada() == "roque") {
+			Dimension dimensionAtualDaTorre = (Dimension) posicaoParaRetorno.GetDimension().clone();
+			Dimension dimensionRetornoDaTorre = (Dimension) posicaoAtual.GetDimension().clone();
+			if (posicaoAtual.GetDimension().width > 5) {
+				dimensionAtualDaTorre.width++;
+				dimensionRetornoDaTorre.width = 7;
+			} else {
+				dimensionAtualDaTorre.width--;
+				dimensionRetornoDaTorre.width = 0;
 			}
+			Peca torre = GetPosicaoPorDimension (dimensionAtualDaTorre).GetPeca();
+			((DetectorDeMovimento) peca).RemoverMovimento();
+			((DetectorDeMovimento) torre).RemoverMovimento();
+			MoverPecaSemRestricoes (torre, dimensionRetornoDaTorre);
+			AtualizarPosicao (dimensionAtualDaTorre);
+			AtualizarPosicao (dimensionRetornoDaTorre);
+			
+		} else if (peca.getClass() == Rei.class || peca.getClass() == Torre.class) {
+			((DetectorDeMovimento) peca).RemoverMovimento();;
+		};
+		
+		System.out.println(peca.GetPosicao().GetDimension() +  " " +  peca +" " + posicaoParaRetorno.GetDimension());
 
-			this.CriarPeca(object, Posicao.posicaoTransposta(posicao2), reviver.GetJogador());
+		MoverPecaSemRestricoes(peca, posicaoParaRetorno.GetDimension());
+		
+		System.out.println(peca.GetPosicao().GetDimension());
 
-		} catch (NullPointerException e) {
-			System.out.println("Nenhuma peca foi revivida");
+		
+		Peca pecaRenascida = jogada.GetPecaDestruida();
+		System.out.println(pecaRenascida);
+		if (pecaRenascida != null) {
+			Dimension destino = (Dimension) posicaoAtual.GetDimension().clone();
+			if (jogada.GetTipoDeJogada() == "en passant") {
+				if (peca.GetJogador() == 1) {
+					destino.height -= 1;
+				} else {
+					destino.height += 1;
+				}
+			}
+			pecas.add(pecaRenascida);
+			MoverPecaSemRestricoes (pecaRenascida, destino);
+			pecaRenascida.SetPosicao(GetPosicaoPorDimension(destino));
+			AtualizarPosicao (destino);
 		}
 
-		//TODO checar se devemos trocar width com height
-//		frame.desgrifarQuadrado(posicao1.GetDimension().width, posicao1.GetDimension().height, this.transposedMatrix(this.posicoes));
-		frame.desgrifarQuadrado(posicao1.GetDimension().height, posicao1.GetDimension().width, this.transposedMatrix(this.posicoes));
-		frame.desgrifarQuadrado(posicao2.GetDimension().width, posicao2.GetDimension().height, this.transposedMatrix(this.posicoes));
-		frame.desgrifarQuadrado(posicao2.GetDimension().height, posicao2.GetDimension().width, this.transposedMatrix(this.posicoes));
+		System.out.println("FInal: " + GetPosicaoPorDimension(new Dimension (5,7)).GetPeca());
+		
+		AtualizarPosicao (posicaoParaRetorno.GetDimension());
+		AtualizarPosicao (posicaoAtual.GetDimension());
+		System.out.println(GetPosicaoPorDimension(new Dimension( 6,6)).GetPeca());
 
+		System.out.println();		
 		this.turnoAnterior();
+	}
+	
+	private void AtualizarPosicao (Dimension dimension) {
+		TabuleiroFrame.GetInstance().desgrifarQuadrado(dimension.height, dimension.width, transposedMatrix(this.posicoes));
 	}
 
 	public void MoverPecaSemRestricoes (Peca peca, Dimension dimension) {
@@ -205,25 +267,11 @@ public class Tabuleiro {
 		peca.Mover(posicao);
 	}
 	
-	public void RetornarJogada (Posicao posicaoPresente, Posicao posicaoDestino, Peca pecaRemovida) {
-		turno --;
-		AlternarJogador ();
-		MoverPecaSemRestricoes(posicaoPresente.GetPeca(), posicaoDestino.GetDimension());
-		if (pecaRemovida != null) {
-			RecriarPeca (pecaRemovida);
-		}
-	}
-	
 	private void AlternarJogador () {
 		jogadorAtual ++;
 		if (jogadorAtual > 2) {
 			jogadorAtual = 1;
 		}
-	}
-	
-	private void RecriarPeca (Peca pecaRemovida) {
-		pecas.add(pecaRemovida);
-		pecaRemovida.Mover(pecaRemovida.GetPosicao());
 	}
 	
 	public int getTurno() {
@@ -249,7 +297,7 @@ public class Tabuleiro {
 		pecaCheque = AdaptadorDeMovimento.GetInstance().VerificarAmeaca(rei.GetPosicao().GetDimension(), jogadorAtual);
 	}
 	
-	//Verifica se o jogador nao tera movimentos disponiveis resultando em um emapte:
+	//Verifica se o jogador nao tera movimentos disponiveis resultando em um empate:
 	private void VerificarFimDeJogo () {
 		boolean empateNegado = false;
 		for (Peca peca : pecas) {
@@ -270,6 +318,10 @@ public class Tabuleiro {
 	}
 	
 	private void TerminarJogo (int jogadorPerdedor) {
+		int jogadorVencedor = jogadorPerdedor -1;
+		if (jogadorVencedor == 0) {
+			jogadorVencedor = 2;
+		}
 		//Termina o jogo com o numero do jogador como perdedor.
 	}
 
@@ -302,7 +354,7 @@ public class Tabuleiro {
 	}
 
 	public Posicao[][] getPosicoes() {
-		return Tabuleiro.transposedMatrix(posicoes);
+		return transposedMatrix(posicoes);
 	}
 
 	public static Posicao[][] transposedMatrix(Posicao[][] posicoes) {
@@ -315,17 +367,5 @@ public class Tabuleiro {
 		}
 
 		return posicoesT;
-	}
-
-	/*Remover os metodos a seguir:*/
-
-	public void MostrarTabuleiro () {
-		for (int i = 0; i < posicoes.length; i++) {
-			for (int j = 0; j < posicoes[1].length; j++) {
-				System.out.print(posicoes[j][i].GetPeca() + " ");
-			}
-			System.out.println();
-		}
-		
 	}
 }

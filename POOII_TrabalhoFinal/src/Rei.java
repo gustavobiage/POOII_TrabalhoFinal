@@ -2,6 +2,7 @@
 public class Rei extends Peca implements DetectorDeMovimento {
 	
 	private boolean ativa = false;
+	private int movimentos = 0;
 	
 	public Rei(Posicao posicao, int jogador) {
 		super(posicao, jogador);
@@ -20,4 +21,20 @@ public class Rei extends Peca implements DetectorDeMovimento {
 
 	@Override
 	public void Desativar() {ativa = false;}
+	
+	@Override
+	public void AdicionarMovimento () {
+		movimentos ++;
+		if (movimentos == 1) {
+			TornarAtiva();
+		}
+	}
+	
+	@Override
+	public void RemoverMovimento () {
+		movimentos --;
+		if (movimentos == 0) {
+			Desativar();
+		}
+	}
 }

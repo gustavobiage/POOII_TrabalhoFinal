@@ -23,11 +23,5 @@ public class Menu2 extends JFrame {
 		setSize(500,500);
 		setVisible(true);
 				
-		
 	}
-
-//	public static void main(String[] args) {
-//		Menu2 menu2 = new Menu2();
-//		menu2.setDefaultCloseOperation(EXIT_ON_CLOSE);
-//	}
 }

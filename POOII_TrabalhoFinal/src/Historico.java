@@ -12,12 +12,16 @@ public class Historico {
 
         this.frame = frame;
     }
+    
+    public Jogada GetUltimaJogada () {
+    	return jogadas [posFinal - 1];
+    }
 
     public void desfazer() {
         if(posBusca == 0) return;
 
         posBusca--;
-        Tabuleiro.GetInstance().voltarJogada(jogadas[posBusca], frame);
+        Tabuleiro.GetInstance().voltarJogada(jogadas[posBusca]);
     }
 
     boolean write = true;
@@ -33,12 +37,13 @@ public class Historico {
                 , jogadas[posBusca].pegarPosicaoNova().GetDimension());
         write = true;
         posBusca++;
+        TabuleiroFrame.GetInstance().DesgrifarQuadrados ();
         return jog;
     }
 
-    public void escreverHistorico(Posicao posicaoAtual, Posicao posicaoNova) {
+    public void escreverHistorico(Posicao posicaoAtual, Posicao posicaoNova, String tipoDeJogada, Peca pecaDestruida) {
         if(write) {
-            Jogada jogada = new Jogada(posicaoAtual, posicaoNova);
+            Jogada jogada = new Jogada(posicaoAtual, posicaoNova, tipoDeJogada, pecaDestruida);
             jogadas[posBusca] = jogada;
             posFinal = posBusca+1;
             posBusca++;

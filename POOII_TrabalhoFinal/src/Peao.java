@@ -1,5 +1,5 @@
 
-public class Peao extends Peca implements DetectorDeMovimento {
+public class Peao extends Peca {
 
 	private boolean ativa = false;
 	
@@ -9,16 +9,6 @@ public class Peao extends Peca implements DetectorDeMovimento {
 	}
 
 	@Override
-	public void TornarAtiva() {
-		ativa = true;
-	}
-
-	@Override
-	public boolean JaMoveu() {
-		return ativa;
-	}
-	
-	@Override
 	public void Mover(Posicao posicao) {
 		super.Mover(posicao);
 		if (posicao.GetDimension().height == 7 - 7*(this.GetJogador()-1)) {
@@ -26,12 +16,18 @@ public class Peao extends Peca implements DetectorDeMovimento {
 		}
 	}
 
-	@Override
-	public void Desativar() {
-		ativa = false;
+	
+	public boolean ChecarEvolucao () {
+		return posicao.GetDimension().height == 6 - 5*(this.GetJogador()-1);
+	}
+	
+	public boolean ChecarEnPassant (Posicao posicao) {
+		return posicao.GetPeca() == null && posicao.GetDimension().width != this.posicao.GetDimension().width;
 	}
 
 	private void Evoluir () {
-		//Apaga o pe�o e cria uma nova pe�a no local.
+		posicao.RemoverPeca();
+		Tabuleiro.GetInstance().RemoverPecaDaLista(this);
+		Tabuleiro.GetInstance().CriarPeca("Dama", posicao.GetDimension(), jogador);
 	}
 }

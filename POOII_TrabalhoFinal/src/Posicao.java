@@ -29,10 +29,6 @@ public class Posicao extends JButton {
 		pecaPresente = peca;
 	}
 
-    public void adicionarPecaAPosicao (Peca peca) {
-        pecaPresente = peca;
-    }
-
     public void RemoverPeca () {
         pecaPresente = null;
     }
@@ -58,7 +54,7 @@ public class Posicao extends JButton {
     @Override
     public Posicao clone() {
         Posicao posicao = new Posicao(this.dimension.width,this.dimension.height);
-        posicao.adicionarPecaAPosicao(this.pecaPresente);
+        posicao.AdicionarPeca (pecaPresente);
         posicao.informarQuadrado(quadrado);
 
         return posicao;

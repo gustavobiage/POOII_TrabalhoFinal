@@ -1,10 +1,24 @@
 public abstract class Peca {
 
     private String nome;
+    protected int jogador;
     private Lado lado;
+    protected Posicao posicao;
+    private Pino pino;
 
-    private int x, y;
+    public Peca (Posicao posicao, int jogador) {
 
+        this.posicao = posicao;
+    	this.jogador = jogador;
+        posicao.AdicionarPeca (this);
+        
+        if (jogador == 1) {
+            lado = Lado.BRANCAS;
+        } else {
+            lado = Lado.PRETAS;
+        }
+    }
+    
     public String pegarNome() {
         return nome + "_" + lado;
     }
@@ -21,8 +35,6 @@ public abstract class Peca {
         return this.lado;
     }
 
-    public void movimentos(){}
-
     public int pegarX() {
         return posicao.GetDimension().width;
     }
@@ -31,23 +43,11 @@ public abstract class Peca {
         return posicao.GetDimension().height;
     }
 
-    protected Posicao posicao;
-    private Pino pino;
-
-    public Peca (Posicao posicao, int jogador) {
-        if(jogador == 1) {
-            lado = Lado.BRANCAS;
-        } else {
-            lado = Lado.PRETAS;
-        }
-
-        posicao.adicionarPecaAPosicao(this);
-        this.posicao = posicao;
-    }
-
     public void Mover (Posicao posicao) {
-        this.posicao.RemoverPeca ();
-        posicao.adicionarPecaAPosicao(this);
+    	if (this.posicao.GetPeca() == this) {
+    		this.posicao.RemoverPeca ();
+    	}
+        posicao.AdicionarPeca (this);
         this.posicao = posicao;
     }
 
@@ -71,6 +71,11 @@ public abstract class Peca {
     public Posicao GetPosicao () {
         return posicao;
     }
+    
+    public void SetPosicao (Posicao posicao) {
+    	this.posicao = posicao;
+    }
+    
     enum Lado{
         BRANCAS, PRETAS;
     }

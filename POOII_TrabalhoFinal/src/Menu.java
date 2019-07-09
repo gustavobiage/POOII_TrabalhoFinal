@@ -4,7 +4,9 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -18,7 +20,7 @@ public class Menu extends JFrame {
 	
 	private JButton novoJogo, salvar, faca, desfaca, continuarJogo;
 	private JPanel panel;
-	private JLabel labelLateral, labelInferior;
+	private JLabel labelLateral;
 	private Historico historico;
 
 	public Historico getHistorico() {
@@ -39,7 +41,6 @@ public class Menu extends JFrame {
 		faca = new JButton("Fazer");
 		faca.setBackground(Color.WHITE);
 		
-		labelInferior = new JLabel(" ");
 		labelLateral = new JLabel(" ");
 		
 		BufferedImage bi = null;
@@ -47,9 +48,8 @@ public class Menu extends JFrame {
 			File file = new File("Imagens/mesa.jpg");
 			bi = ImageIO.read(file);
 			   ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-			 
-			
-		}catch (Exception e) {
+			   
+		}	catch (Exception e) {
 			
 		}
 		
@@ -74,12 +74,8 @@ public class Menu extends JFrame {
 		panel.add(cont1, BorderLayout.NORTH);
 		panel.add(labelLateral, BorderLayout.EAST);
 		panel.add(labelLateral, BorderLayout.WEST);
-//		panel.add(labelInferior, BorderLayout.SOUTH);
 
-		Posicao[][] posicao = Tabuleiro.GetInstance().getPosicoes();
-		TabuleiroFrame tf = new TabuleiroFrame(Tabuleiro.GetInstance().getPosicoes());
-//		tf.setPreferredSize(new Dimension(500, 500));
-//		tf.setMaximumSize(new Dimension(500, 500));
+		TabuleiroFrame tf = new TabuleiroFrame();
 		ImagePanel wrapper = new ImagePanel(bi);
 		wrapper.add(tf);
 		wrapper.setBackground(Color.LIGHT_GRAY);
@@ -102,23 +98,21 @@ public class Menu extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				getHistorico().desfazer();
-				tf.revizarTabuleiro();
+				tf.revisarTabuleiro();
 			}
 		});
 
 		faca.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				try {
-					Jogada j = getHistorico().refazer();
+				Jogada j = getHistorico().refazer();
+				if (j != null) {
 					Dimension dim = j.pegarPosicaoNova().GetDimension();
 					tf.desgrifarQuadrado(dim.width, dim.height, Tabuleiro.GetInstance().getPosicoes());
 					tf.desgrifarQuadrado(dim.height, dim.width, Tabuleiro.GetInstance().getPosicoes());
 					dim = j.pegarPosicaoAtual().GetDimension();
 					tf.desgrifarQuadrado(dim.width, dim.height, Tabuleiro.GetInstance().getPosicoes());
 					tf.desgrifarQuadrado(dim.height, dim.width, Tabuleiro.GetInstance().getPosicoes());
-				} catch (NullPointerException ex) {
-					ex.printStackTrace();
 				}
 			}
 		});
@@ -150,21 +144,21 @@ public class Menu extends JFrame {
 	public static void main(String[] args) {
 		Menu menu = new Menu();
 		menu.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}	
+}
+
+class ImagePanel extends JPanel {
+
+	Image bgImage;
+
+	public ImagePanel(BufferedImage bi) {
+		bgImage = bi;
+	}
+
+	@Override
+	  protected void paintComponent(Graphics g) {
+
+	    super.paintComponent(g);
+	        g.drawImage(bgImage, 0, 0, null);
 	}
 }
-//
-//class ImagePanel extends JPanel {
-//
-//	Image bgImage;
-//
-//	public ImagePanel(BufferedImage bi) {
-//		bgImage = bi;
-//	}
-//
-//	@Override
-//	  protected void paintComponent(Graphics g) {
-//
-//	    super.paintComponent(g);
-//	        g.drawImage(bgImage, 0, 0, null);
-//	}
-//}

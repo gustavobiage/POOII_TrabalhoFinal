@@ -23,6 +23,18 @@ public class GestaoImagem {
 //        repositorio_imagem.put("quadrado_escuro_selecionavel", "Imagens/quadrado_claro_selecionavel.");
 
         //Pecas
+        //PNG
+        repositorio_imagem.put("dama_pretas", "Imagens/PNG/dama_pretas.png");
+        repositorio_imagem.put("dama_brancas", "Imagens/PNG/dama_brancas.png");
+
+        repositorio_imagem.put("bispo_pretas", "Imagens/PNG/bispo_pretas.png");
+        repositorio_imagem.put("bispo_brancas", "Imagens/PNG/bispo_brancas.png");
+
+        repositorio_imagem.put("cavalo_pretas", "Imagens/PNG/cavalo_pretas.png");
+        repositorio_imagem.put("cavalo_brancas", "Imagens/PNG/cavalo_brancas.png");
+
+        repositorio_imagem.put("torre_pretas", "Imagens/PNG/torre_pretas.png");
+        repositorio_imagem.put("torre_brancas", "Imagens/PNG/torre_brancas.png");
 
         //  dama
         repositorio_imagem.put("dama_pretas_quadrado_claro", "Imagens/dama_pretas_quadrado_claro.jpg");

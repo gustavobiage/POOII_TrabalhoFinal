@@ -1,6 +1,10 @@
 import java.awt.*;
 import java.util.*;
 
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.WindowConstants;
+
 public class Tabuleiro {
 	
 	private static Tabuleiro tabuleiro = new Tabuleiro ();
@@ -185,16 +189,12 @@ public class Tabuleiro {
 
 	public void voltarJogada(Jogada jogada) {
 		
-		System.out.println(GetPosicaoPorDimension(new Dimension (5,7)).GetPeca());
-		
 		TabuleiroFrame.GetInstance().DesgrifarQuadrados ();
 
 		Posicao posicaoAtual = jogada.pegarPosicaoNova();
 		Posicao posicaoParaRetorno = jogada.pegarPosicaoAtual();
 
 		Peca peca = posicaoAtual.GetPeca();
-		
-		System.out.println(peca);
 		
 		if (jogada.GetTipoDeJogada() == "evolucao") {
 			Dimension d = posicaoAtual.GetDimension();
@@ -223,16 +223,10 @@ public class Tabuleiro {
 		} else if (peca.getClass() == Rei.class || peca.getClass() == Torre.class) {
 			((DetectorDeMovimento) peca).RemoverMovimento();;
 		};
-		
-		System.out.println(peca.GetPosicao().GetDimension() +  " " +  peca +" " + posicaoParaRetorno.GetDimension());
 
 		MoverPecaSemRestricoes(peca, posicaoParaRetorno.GetDimension());
 		
-		System.out.println(peca.GetPosicao().GetDimension());
-
-		
 		Peca pecaRenascida = jogada.GetPecaDestruida();
-		System.out.println(pecaRenascida);
 		if (pecaRenascida != null) {
 			Dimension destino = (Dimension) posicaoAtual.GetDimension().clone();
 			if (jogada.GetTipoDeJogada() == "en passant") {
@@ -247,14 +241,9 @@ public class Tabuleiro {
 			pecaRenascida.SetPosicao(GetPosicaoPorDimension(destino));
 			AtualizarPosicao (destino);
 		}
-
-		System.out.println("FInal: " + GetPosicaoPorDimension(new Dimension (5,7)).GetPeca());
 		
 		AtualizarPosicao (posicaoParaRetorno.GetDimension());
-		AtualizarPosicao (posicaoAtual.GetDimension());
-		System.out.println(GetPosicaoPorDimension(new Dimension( 6,6)).GetPeca());
-
-		System.out.println();		
+		AtualizarPosicao (posicaoAtual.GetDimension());	
 		this.turnoAnterior();
 	}
 	
@@ -321,12 +310,22 @@ public class Tabuleiro {
 		int jogadorVencedor = jogadorPerdedor -1;
 		if (jogadorVencedor == 0) {
 			jogadorVencedor = 2;
-		}
-		//Termina o jogo com o numero do jogador como perdedor.
+		}		
+		JFrame jFrame = new JFrame ();
+		JLabel jLabel = new JLabel ();
+		jFrame.setSize(new Dimension (200, 100));
+		jFrame.add(jLabel);
+		jLabel.setText("Jogador "+ jogadorVencedor + " é o vencedor!");
+		jFrame.setVisible(true);
 	}
 
 	private void Empatar () {
-		//Termina o jogo com um emapte
+		JFrame jFrame = new JFrame ();
+		JLabel jLabel = new JLabel ();
+		jFrame.setSize(new Dimension (200, 100));
+		jFrame.add(jLabel);
+		jLabel.setText("Parece que ocorreu um empate!");
+		jFrame.setVisible(true);
 	}
 	
 	public ArrayList <Torre> GetTorres (int jogador) {
